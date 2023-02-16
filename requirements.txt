@@ -1,0 +1,8 @@
+# Basic requirements
+pandas
+numpy
+
+# API requirements
+requests
+
+# ML Framework
