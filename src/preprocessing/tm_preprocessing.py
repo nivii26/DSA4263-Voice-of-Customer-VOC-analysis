@@ -28,7 +28,7 @@ if __name__ == "__main__":
 	positive_text = pd.DataFrame(columns=["Text"])
 	negative_text = pd.DataFrame(columns=["Text"])
 
-    # Load Data
+    	# Load Data
 	for file in os.listdir(r"../../data/processed"):
 		if file.endswith("TM_POS_DATA.csv"):
 			new_data = pd.read_csv(rf"../../data/processed/{file}").loc[:, ["Text"]]
@@ -40,8 +40,8 @@ if __name__ == "__main__":
 	# Pipeline and Process data
 	min_len = 2
 	max_len = 15
-	positive_text["Text"] = positive_text["Text"].apply(lambda x: tm_preprocess(x, min_len, max_len), axis = 1)
-	negative_text["Text"] = negative_text["Text"].apply(lambda x: tm_preprocess(x, min_len, max_len), axis = 1)
+	positive_text["Text"] = positive_text["Text"].apply(lambda x: tm_preprocess(x, min_len, max_len))
+	negative_text["Text"] = negative_text["Text"].apply(lambda x: tm_preprocess(x, min_len, max_len))
 	# BOW
 	pos_dict = corpora.Dictionary(positive_text["Text"])
 	pos_corpus = [pos_dict.doc2bow(text) for text in positive_text["Text"]]
@@ -74,6 +74,17 @@ if __name__ == "__main__":
 		for term_index, weight in pos_tfidf_weights:
 			print(f"Term '{pos_dict[term_index]}' has TF-IDF weight of {weight}")
 	"""
+
+	# Embedding for tfidf data
+	"""
+	size: Dimensionality of the embedding vectors
+	window: size of context window
+	min_count: minimum required count of the word for it to be included
+	workers: threads used during training
+	"""
+	pos_w2v = models.Word2Vec(sentences=pos_tfidf_corpus, size=100, window=5, min_count=5, workers=4)
+	neg_w2v = models.Word2Vec(sentences=neg_tfidf_corpus, size=100, window=5, min_count=5, workers=4)
+	
 
 	
 
