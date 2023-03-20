@@ -47,6 +47,8 @@ if __name__ == "__main__":
 
 			# Basic Exploratory Data Analysis (EDA)
 			## Generate a report on the data (missing, duplicates)
+			if "reports" not in os.listdir():
+				os.makedirs(r"./reports")
 			ProfileReport(raw_data).to_file(rf'./reports/{current_time}_{file[:-4]}_report.html')
 
 			## Clean the data
