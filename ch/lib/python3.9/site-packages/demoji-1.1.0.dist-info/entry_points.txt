@@ -1,0 +1,3 @@
+[console_scripts]
+demoji = demoji.main:main
+
