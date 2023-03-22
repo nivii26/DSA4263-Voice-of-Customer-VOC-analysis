@@ -1,9 +1,17 @@
 .DS_Store
 *__pycache__
-*.venv
-*.env
 .vscode
 *.ipynb
+
+# Env
+*.venv
+*.env
+
+# Data
 *.csv
+
+# NLP
+pos_wv
+neg_wv
 *.mm*
 *.dict*
