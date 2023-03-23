@@ -1,0 +1,246 @@
+Metadata-Version: 2.1
+Name: demoji
+Version: 1.1.0
+Summary: Accurately remove and replace emojis in text strings
+Home-page: https://github.com/bsolomon1124/demoji
+Author: Brad Solomon
+Author-email: bsolomon@protonmail.com
+License: Apache-2.0
+Project-URL: Source, https://github.com/bsolomon1124/demoji
+Project-URL: Documentation, https://github.com/bsolomon1124/demoji/blob/master/README.md
+Project-URL: Bug Reports, https://github.com/bsolomon1124/demoji/issues
+Keywords: emoji,emojis,nlp,natural langauge processing,unicode
+Platform: UNKNOWN
+Classifier: Development Status :: 3 - Alpha
+Classifier: Topic :: Utilities
+Classifier: Topic :: Text Processing
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: importlib-resources ; python_version < "3.7"
+Provides-Extra: ujson
+Requires-Dist: ujson ; extra == 'ujson'
+
+# demoji
+
+Accurately find or remove [emojis](https://en.wikipedia.org/wiki/Emoji) from a blob of text using
+data from the Unicode Consortium's [emoji code repository](https://unicode.org/Public/emoji/).
+
+[![License](https://img.shields.io/github/license/bsolomon1124/demoji.svg)](https://github.com/bsolomon1124/demoji/blob/master/LICENSE)
+[![PyPI](https://img.shields.io/pypi/v/demoji.svg)](https://pypi.org/project/demoji/)
+[![Status](https://img.shields.io/pypi/status/demoji.svg)](https://pypi.org/project/demoji/)
+[![Python](https://img.shields.io/pypi/pyversions/demoji.svg)](https://pypi.org/project/demoji)
+
+-------
+
+## Major Changes in Version 1.x
+
+Version 1.x of `demoji` now bundles Unicode data in the package at install time rather than requiring
+a download of the codes from unicode.org at runtime. Please see the [CHANGELOG.md](CHANGELOG.md)
+for detail and be familiar with the changes before updating from 0.x to 1.x.
+
+To report any regressions, please [open a GitHub issue](https://github.com/bsolomon1124/demoji/issues/new?assignees=&labels=&template=bug_report.md&title=).
+
+## Basic Usage
+
+`demoji` exports several text-related functions for find-and-replace functionality with emojis:
+
+```python
+>>> tweet = """\
+... #startspreadingthenews yankees win great start by 🎅🏾 going 5strong innings with 5k’s🔥 🐂
+... solo homerun 🌋🌋 with 2 solo homeruns and👹 3run homerun… 🤡 🚣🏼 👨🏽‍⚖️ with rbi’s … 🔥🔥
+... 🇲🇽 and 🇳🇮 to close the game🔥🔥!!!….
+... WHAT A GAME!!..
+... """
+>>> demoji.findall(tweet)
+{
+    "🔥": "fire",
+    "🌋": "volcano",
+    "👨🏽\u200d⚖️": "man judge: medium skin tone",
+    "🎅🏾": "Santa Claus: medium-dark skin tone",
+    "🇲🇽": "flag: Mexico",
+    "👹": "ogre",
+    "🤡": "clown face",
+    "🇳🇮": "flag: Nicaragua",
+    "🚣🏼": "person rowing boat: medium-light skin tone",
+    "🐂": "ox",
+}
+```
+
+See [below](#reference) for function API.
+
+## Command-line Use
+
+You can use `demoji` or `python -m demoji` to replace emojis
+in file(s) or stdin with their `:code:` equivalents:
+
+```bash
+$ cat out.txt
+All done! ✨ 🍰 ✨
+$ demoji out.txt
+All done! :sparkles: :shortcake: :sparkles:
+
+$ echo 'All done! ✨ 🍰 ✨' | demoji
+All done! :sparkles: :shortcake: :sparkles:
+
+$ demoji -
+we didnt start the 🔥
+we didnt start the :fire:
+```
+
+## Reference
+
+```python
+findall(string: str) -> Dict[str, str]
+```
+
+Find emojis within `string`.  Return a mapping of `{emoji: description}`.
+
+```python
+findall_list(string: str, desc: bool = True) -> List[str]
+```
+
+Find emojis within `string`.  Return a list (with possible duplicates).
+
+If `desc` is True, the list contains description codes.  If `desc` is False, the list contains emojis.
+
+```python
+replace(string: str, repl: str = "") -> str
+```
+
+Replace emojis in `string` with `repl`.
+
+```python
+replace_with_desc(string: str, sep: str = ":") -> str
+```
+
+Replace emojis in `string` with their description codes.  The codes are surrounded by `sep`.
+
+```python
+last_downloaded_timestamp() -> datetime.datetime
+```
+
+Show the timestamp of last download for the emoji data bundled with the package.
+
+## Footnote: Emoji Sequences
+
+Numerous emojis that look like single Unicode characters are actually multi-character sequences.  Examples:
+
+- The keycap 2️⃣ is actually 3 characters, U+0032 (the ASCII digit 2), U+FE0F (variation selector), and U+20E3 (combining enclosing keycap).
+- The flag of Scotland 7 component characters, `b'\\U0001f3f4\\U000e0067\\U000e0062\\U000e0073\\U000e0063\\U000e0074\\U000e007f'` in full esaped notation.
+
+(You can see any of these through `s.encode("unicode-escape")`.)
+
+`demoji` is careful to handle this and should find the full sequences rather than their incomplete subcomponents.
+
+The way it does this it to sort emoji codes by their length, and then compile a concatenated regular expression that will greedily search for longer emojis first, falling back to shorter ones if not found.  This is not by any means a super-optimized way of searching as it has O(N<sup>2</sup>) properties, but the focus is on accuracy and completeness.
+
+```python
+>>> from pprint import pprint
+>>> seq = """\
+... I bet you didn't know that 🙋, 🙋‍♂️, and 🙋‍♀️ are three different emojis.
+... """
+>>> pprint(seq.encode('unicode-escape'))  # Python 3
+(b"I bet you didn't know that \\U0001f64b, \\U0001f64b\\u200d\\u2642\\ufe0f,"
+ b' and \\U0001f64b\\u200d\\u2640\\ufe0f are three different emojis.\\n')
+```
+
+# Changelog
+
+## 1.1.0
+
+- Add a `__main.py__` to allow running `python -m demoji`;
+  add an entry-point `demoji` command;
+  permit stdin (`-`), file name(s), or piped stdin.
+  Contribution by @jap.
+
+## 1.0.0
+
+**This is a backwards-incompatible release with several substantial changes.**
+
+The largest change is that `demoji` now bundles a static copy of Unicode
+emoji data with the package at install time, rather than requiring a runtime
+download of the codes from unicode.org.
+
+Changes below are grouped by their corresponding
+[Semantic Versioning](https://semver.org/) identifier.
+
+SemVer MAJOR:
+
+- Drop support for Python 2 and Python 3.5
+- The `demoji` package now bundles emoji data that is distributed with the
+  package at install time, rather than requiring a download of the codes
+  from the unicode.org site at runtime (closes #23)
+- As a result of the above change, the following functions are **removed**
+  from the `demoji` API:
+  - `download_codes()`
+  - `parse_unicode_sequence()`
+  - `parse_unicode_range()`
+  - `stream_unicodeorg_emojifile()`
+
+SemVer MINOR:
+
+- The `demoji.DIRECTORY` and `demoji.CACHEPATH` attributes are deprecated
+  due to no longer being functionally in used by the package. Accessing them
+  will warn with a `FutureWarning`, and these attributes may be removed
+  completely in a future release
+- `demoji` can now be installed with optional `ujson` support for faster loading
+  of emoji data from file (versus the standard library's `json`, which is the
+  default); use `python -m pip install demoji[ujson]`
+- The dependencies `requests` and `colorama` have been removed completely
+- `importlib_resources` (a backport module) is now required for Python < 3.7
+- The `EMOJI_VERSION` attribute, newly added to `demoji`, is a `str` denoting
+  the Unicode database version in use
+
+SemVer PATCH:
+
+- Fix a typo in `demoji.__all__` to properly include `demoji.findall_list()`
+- Internal change: Functions that call `set_emoji_pattern()` are now decorated
+  with a `@cache_setter` to set the cache
+- Some unit tests have been removed to update the change in behavior from
+  downloading codes to bundling codes with install
+- Update README to reflect bundling behavior
+
+## 0.4.0
+
+- Update emoji source list to version 13.1. (See 5090eb5.)
+- Formally support Python 3.9. (See 6e9c34c.)
+- Bugfix: ensure that `demoji.last_downloaded_timestamp()` returns correct UTC time.
+  (See 6c8ad15.)
+
+## 0.3.0
+
+- Feature: add `findall_list()` and `replace_with_desc()` functions. (See 7cea333.)
+- Modernize setup config to use `setup.cfg`. (See 8f141e7.)
+
+## 0.2.1
+
+- Tox: formally add Python 3.8 tests.
+
+## 0.2.0
+
+- Windows: use the [colorama] package to support printing ANSI escape sequences on Windows;
+  this introduces colorama as a dependency.  (See cd343c1.)
+- Setup: Fix a bug in `setup.py` that would require dependencies to be installed
+  _prior to_ installation of `demoji` in order to find the `__version__`.
+  (See d5f429c.)
+- Python 2 + Windows support: use `io.open(..., encoding='utf-8')` consistently in `setup.py`.
+  (See 1efec5d.)
+- Distribution: use a universal wheel in PyPI release. (See 8636a32.)
+
+[colorama]: https://github.com/tartley/colorama
+
+## 0.1.5
+
+- Performance improvement: use `re.escape()` rather than failing to compile a small subset of codes.
+- Remove an unused constant in `__init__.py`.
+
+
