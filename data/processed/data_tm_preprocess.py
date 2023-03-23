@@ -15,31 +15,52 @@ from gensim.parsing.preprocessing import STOPWORDS
 import contractions
 import demoji
 
-
 def preprocess_text(reviewText):
+	"""
+	Cleans Text Data
+
+	Input: 
+	reviewText (String)
+
+	Output:
+	reviewText (String)
+	"""
+	# Change contractions to words
+	reviewText = " ".join(contractions.fix(word) for word in reviewText.split())
+	# Remove emojis
+	reviewText = demoji.replace(reviewText, "")
 	# Remove html
 	reviewText = re.sub(r"<[^>]+>", " ", reviewText)
 	# To Lower Case
 	reviewText = reviewText.lower()
-	# Remove digits
-	reviewText = re.sub("[^a-zA-Z]+", " ", reviewText)
 	# Words containing digits
 	reviewText = re.sub('\w*\d\w*','', reviewText)
-	# Remove punctuations
-	reviewText = re.sub('[%s]' % re.escape(string.punctuation), '', reviewText)
+	# Remove digits
+	reviewText = re.sub("[^a-zA-Z]+", " ", reviewText)
 	# Remove Extra Spaces
 	reviewText = re.sub(' +',' ', reviewText)
-	# Remove emojis
-	reviewText = demoji.replace(reviewText, "")
-	# Change contractions to words
-	reviewText = " ".join(contractions.fix(word) for word in reviewText.split())
+	# Remove punctuations
+	reviewText = re.sub('[%s]' % re.escape(string.punctuation), '', reviewText)
 	return reviewText
 
 if __name__ == "__main__":
+
+	"""
+	1. Generate a Basic EDA (Missing, Duplicate, Distribution) report for new Raw Data which can
+	be found under data/processed/reports folder
+	2. Clean ALL csv datasets in the Raw Folder and combine them into 1 cleaned dataframe which is 
+	saved in processed folder with the filename: [datetime of run]_CLEANED_DATA.csv
+
+	Input: 
+	All Raw CSV files in the data/raw directory [NOTE: Columns have to be "Sentiment", "Time", "Text"]
+	#TODO: Streamline Code to Check for the format above 
+
+	Output:
+	Combined cleaned dataset with the filename [datetime of run]_CLEANED_DATA.csv suitable for all NLP tasks
+	"""
 	
 	current_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
-	positive_data = pd.DataFrame(columns=["Sentiment", "Time", "Text"])
-	negative_data = pd.DataFrame(columns=["Sentiment", "Time", "Text"])
+	final_cleaned_data = pd.DataFrame(columns=["Sentiment", "Time", "Text"])
 	
 	for file in os.listdir(r"../raw"):
 		if file.endswith(".csv"):
@@ -57,9 +78,7 @@ if __name__ == "__main__":
 			## Preprocess the Review Column
 			cleaned_data["Text"] = cleaned_data["Text"].apply(preprocess_text)
 
-			## Separate into sentiments for topic modelling
-			positive_data = pd.concat([positive_data, cleaned_data.loc[cleaned_data["Sentiment"] == "positive"]])
-			negative_data = pd.concat([negative_data, cleaned_data.loc[cleaned_data["Sentiment"] == "negative"]])
+			## Combine all the cleaned datasets
+			final_cleaned_data = pd.concat([final_cleaned_data, cleaned_data])
 
-	positive_data.to_csv(f"{current_time}_TM_POS_DATA.csv", index = False)
-	negative_data.to_csv(f"{current_time}_TM_NEG_DATA.csv", index = False)
+	final_cleaned_data.to_csv(f"{current_time}_CLEANED_DATA.csv", index = False)
