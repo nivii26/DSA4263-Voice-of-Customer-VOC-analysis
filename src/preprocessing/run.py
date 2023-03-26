@@ -17,9 +17,9 @@ test_data = pd.concat([positive_test, negative_test])
 train_data.to_csv("train.csv", index=False)
 test_data.to_csv("test.csv", index=False)
 
-train_feature,word2vec_model,tfidf = features_sa_train(train_data)
+train_feature,word2vec_model,tfidf, pca_emb, pca_tfidf = features_sa_train(train_data)
 train_feature.to_csv("features_train.csv", index=False)
 
-test_feature, sentiment = features_sa_test(test_data,word2vec_model,tfidf)
+test_feature, sentiment = features_sa_test(test_data,word2vec_model,tfidf, pca_emb, pca_tfidf)
 print(test_feature["Sentiment"])
 test_feature.to_csv("features_test.csv", index=False)
