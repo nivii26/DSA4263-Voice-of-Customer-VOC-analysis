@@ -87,7 +87,8 @@ def features_sa_train(train_data):
 
     # perform PCA with n_components set to retain 98% of variance
     pca_emb = PCA(n_components=0.98)
-    features_emb_pca = pca_emb.fit_transform(features_df)
+    pca_emb.fit(features_df)
+    features_emb_pca = pca_emb.transform(features_df)
 
     # create a new DataFrame for the PCA features
     pca_emb_cols = [f"PC_emb{i+1}" for i in range(features_emb_pca.shape[1])]
@@ -104,8 +105,9 @@ def features_sa_train(train_data):
     train_matrix = tfidf.transform(train_data['Text'].apply(lambda x: ' '.join(x))).toarray()
     tfidf_features_df = pd.DataFrame(train_matrix, columns=tfidf.get_feature_names_out())
     # perform PCA with n_components set to retain 95% of variance
-    pca = PCA(n_components=0.95)
-    features_tfidf_pca = pca.fit_transform(tfidf_features_df)
+    pca_tfidf = PCA(n_components=0.95)
+    pca_tfidf.fit(tfidf_features_df)
+    features_tfidf_pca = pca_tfidf.transform(tfidf_features_df)
 
     # create a new DataFrame for the PCA features
     pca_tfidf_cols = [f"PC_tfidf{i+1}" for i in range(features_tfidf_pca.shape[1])]
@@ -122,9 +124,9 @@ def features_sa_train(train_data):
     # weight the negative sentiment samples by 2
     features_df.loc[features_df['Sentiment'] == 'negative',label] *= 2
 
-    return features_df, word2vec_model, tfidf
+    return features_df, word2vec_model, tfidf, pca_emb, pca_tfidf
 
-def features_sa_test(test_data,word2vec_model, tfidf):
+def features_sa_test(test_data,word2vec_model, tfidf, pca_emb, pca_tfidf):
     # apply the preprocessing function to the text data
     test_data['Text'] = test_data['Text'].apply(remove_html)
     test_data['Text'] = test_data['Text'].apply(sa_preprocess)
@@ -142,8 +144,7 @@ def features_sa_test(test_data,word2vec_model, tfidf):
 
 
     # perform PCA with n_components set to retain 98% of variance
-    pca_emb = PCA(n_components=0.98)
-    features_emb_pca = pca_emb.fit_transform(features_df)
+    features_emb_pca = pca_emb.transform(features_df)
 
     # create a new DataFrame for the PCA features
     pca_emb_cols = [f"PC_emb{i+1}" for i in range(features_emb_pca.shape[1])]
@@ -155,8 +156,7 @@ def features_sa_test(test_data,word2vec_model, tfidf):
     tfidf_features_df = pd.DataFrame(test_matrix, columns=tfidf.get_feature_names_out())
 
     # perform PCA with n_components set to retain 95% of variance
-    pca = PCA(n_components=0.95)
-    features_tfidf_pca = pca.fit_transform(tfidf_features_df)
+    features_tfidf_pca = pca_tfidf.transform(tfidf_features_df)
 
     # create a new DataFrame for the PCA features
     pca_tfidf_cols = [f"PC_tfidf{i+1}" for i in range(features_tfidf_pca.shape[1])]
