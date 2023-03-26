@@ -4,5 +4,9 @@ numpy
 
 # API requirements
 requests
+fastapi
+json
+python-multipart
+uvicorn
 
 # ML Framework
