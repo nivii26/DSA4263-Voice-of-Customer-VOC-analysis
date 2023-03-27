@@ -8,5 +8,6 @@ fastapi
 json
 python-multipart
 uvicorn
+zipfile
 
 # ML Framework
