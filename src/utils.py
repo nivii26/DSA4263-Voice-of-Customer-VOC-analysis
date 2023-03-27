@@ -2,9 +2,9 @@ import os
 import pandas as pd
 import zipfile
 
-from ..data.processed import rawdata_preprocessing
-from .preprocessing import sa_preprocessing, tm_preprocessing
-from .model import sa_model_predict, tm_model_predict
+#from ..data.processed import rawdata_preprocessing
+#from .preprocessing import sa_preprocessing, tm_preprocessing
+#from .model import sa_model_predict, tm_model_predict
 
 def zip_preprocess(zip_file, expected_columns):
     """

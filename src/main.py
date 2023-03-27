@@ -67,7 +67,7 @@ async def predict_upload_csv(file: fastapi.UploadFile = fastapi.File(...)):
     }
 
 @app.get("/api/raw_data")
-async def get_raw_data(CURRENT_TIME: str):
+async def get_raw_data(CURRENT_TIME: int):
     """
     Endpoint to look at the raw_data submitted in JSON format
     """
@@ -76,7 +76,7 @@ async def get_raw_data(CURRENT_TIME: str):
     return None
 
 @app.get("/api/data_report")
-async def get_data_report(CURRENT_TIME: str):
+async def get_data_report(CURRENT_TIME: int):
     """
     Endpoint to look at the Basic EDA of the raw_data submitted
     """
@@ -85,7 +85,7 @@ async def get_data_report(CURRENT_TIME: str):
     return None
 
 @app.get("/api/cleaned_data")
-async def get_data_report(CURRENT_TIME: str):
+async def get_data_report(CURRENT_TIME: int):
     """
     Endpoint to look at the Basic EDA of the raw_data submitted
     """
@@ -94,7 +94,7 @@ async def get_data_report(CURRENT_TIME: str):
     return None
 
 @app.get("/api/sa_pred")
-async def get_semantic_predictions(CURRENT_TIME: str):
+async def get_semantic_predictions(CURRENT_TIME: int):
     """
     Endpoint to look at the predictions by the SA model 
     """
@@ -103,7 +103,7 @@ async def get_semantic_predictions(CURRENT_TIME: str):
     return None
 
 @app.get("/api/tm_pred")
-async def get_tm_predictions(CURRENT_TIME: str, SENTIMENT="POS"):
+async def get_tm_predictions(CURRENT_TIME: int, SENTIMENT="POS"):
     """
     Endpoint to look at the predictions by the TM model
     """
