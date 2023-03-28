@@ -78,7 +78,7 @@ def retrieve_raw_data(CURRENT_TIME):
 
 def retrieve_cleaned_data(CURRENT_TIME):
     if f"{CURRENT_TIME}_CLEANED_DF.csv" in os.listdir(r"../data/processed"):
-        data = pd.read_csv(fr"../data/processed/{CURRENT_TIME}_PROCESSED_DF.csv")
+        data = pd.read_csv(fr"../data/processed/{CURRENT_TIME}_CLEANED_DF.csv")
         return data
     return None
 

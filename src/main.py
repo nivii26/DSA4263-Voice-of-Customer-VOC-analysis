@@ -85,12 +85,12 @@ async def get_data_report(CURRENT_TIME: int):
     return None
 
 @app.get("/api/cleaned_data")
-async def get_data_report(CURRENT_TIME: int):
+async def get_cleaned_data(CURRENT_TIME: int):
     """
     Endpoint to look at the Basic EDA of the raw_data submitted
     """
     if CURRENT_TIME:
-        return Response(retrieve_cleaned_data(CURRENT_TIME), media_type="text/html")
+        return Response(retrieve_cleaned_data(CURRENT_TIME).to_json(orient="records"), media_type="application/json")
     return None
 
 @app.get("/api/sa_pred")
