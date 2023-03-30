@@ -5,3 +5,7 @@
 .vscode
 *.ipynb
 *.csv
+*.mm
+*.dict
+*.index
+*wv
