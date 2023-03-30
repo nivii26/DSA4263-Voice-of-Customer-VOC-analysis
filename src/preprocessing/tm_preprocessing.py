@@ -48,12 +48,20 @@ if __name__ == "__main__":
 	# BOW
 	pos_dict = corpora.Dictionary(positive_data["Text"])
 	pos_corpus = [pos_dict.doc2bow(text) for text in positive_data["Text"]]
+	pos_dict.save('../../models/pos_bow')
 	neg_dict = corpora.Dictionary(negative_data["Text"])
 	neg_corpus = [neg_dict.doc2bow(text) for text in negative_data["Text"]]
+	neg_dict.save('../../models/neg_bow')
+
 	# TF_IDF
-	pos_tfidf_corpus = models.TfidfModel(pos_corpus)[pos_corpus]
-	neg_tfidf_corpus = models.TfidfModel(neg_corpus)[neg_corpus]
-	
+	pos_tfidf = models.TfidfModel(pos_corpus)
+	pos_tfidf_corpus = pos_tfidf[pos_corpus]
+	pos_tfidf.save('../../models/pos_tfidf')
+	neg_tfidf = models.TfidfModel(neg_corpus)
+	neg_tfidf_corpus = neg_tfidf[neg_corpus]
+	neg_tfidf.save('../../models/neg_tfidf')
+
+
 	# Saving the corpus and dict
 	"""
 	corpus: A list of document vectors, where each vector is represented as a 
@@ -75,14 +83,3 @@ if __name__ == "__main__":
 	#	pos_tfidf_weights = pos_tfidf_corpus[i]
 	#	for term_index, weight in pos_tfidf_weights:
 	#		print(f"Term '{pos_dict[term_index]}' has TF-IDF weight of {weight}")
-	
-
-
-
-
-	
-
-
-
-	    
-	
