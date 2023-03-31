@@ -1,14 +1,13 @@
 # modelling
-from gensim.models.ldamodel import LdaModel
-from gensim.models.nmf import Nmf
-from gensim.models import CoherenceModel
+from gensim.models import LdaModel, Nmf, LsiModel, CoherenceModel
 from tqdm import tqdm
+from pathlib import Path
 
 # plotting and data manipulation
 import pandas as pd
 
-def build_topic_model(model_name, corpus, id2word, 
-                      hyperparameters={}, random_state=0):
+
+def build_topic_model(model_name, corpus, id2word, hyperparameters={}, random_state=0):
     """Build a model and evaluate coherence
     
     Parameters:
@@ -25,23 +24,20 @@ def build_topic_model(model_name, corpus, id2word,
     Returns:
         (int): coherence score
     """
-    
     if model_name == 'lda':
-        model = LdaModel(id2word=id2word, 
-                         corpus=corpus,
-                         random_state=random_state,
-                         **hyperparameters)
-        
+        model = LdaModel(id2word=id2word, corpus=corpus, random_state=random_state, **hyperparameters)
     elif model_name == 'nmf':
-        model = Nmf(id2word=id2word,
-                    corpus=corpus,
-                    random_state=random_state,
-                    **hyperparameters)
-        
+        model = Nmf(id2word=id2word, corpus=corpus, random_state=random_state, **hyperparameters)
+    elif model_name == 'lsa':
+        model = LsiModel(id2word=id2word, corpus=corpus, random_seed=random_state, **hyperparameters)
+    # elif model_name == 'hdp':
+    #     hyperparameters["T"] = hyperparameters.pop("num_topics")
+    #     model = HdpModel(id2word=id2word, corpus=corpus, random_state=random_state, **hyperparameters)
+    else:
+        model = None
     return model
 
-def compute_coherence_score(model_name, corpus, id2word, lemma_text, 
-                            hyperparameters={}, random_state=0, coherence_metric='c_v'):
+def compute_coherence_score(model_name, corpus, id2word, lemma_text, hyperparameters={}, random_state=0, coherence_metric='c_v'):
     """Build a model and evaluate coherence
     
     Parameters:
@@ -58,12 +54,10 @@ def compute_coherence_score(model_name, corpus, id2word, lemma_text,
     Returns:
         (int): coherence score
     """    
-    model = build_topic_model(model_name, corpus, id2word, 
-                              hyperparameters=hyperparameters, random_state=random_state)
-    
-    coherence_model_lda = CoherenceModel(model=model, texts=lemma_text, 
-                                         dictionary=id2word, coherence=coherence_metric)
-    
+    model = build_topic_model(model_name, corpus, id2word, hyperparameters=hyperparameters, random_state=random_state)
+    if model is None:
+        return 0.0 # or raise an exception
+    coherence_model_lda = CoherenceModel(model=model, texts=lemma_text, dictionary=id2word, coherence=coherence_metric)
     return coherence_model_lda.get_coherence()
 
 def evaluate_topic_models(model_name, corpuses, num_topics, id2word, lemma_text):
@@ -91,13 +85,12 @@ def evaluate_topic_models(model_name, corpuses, num_topics, id2word, lemma_text)
         'num topic': [],
         'score': []
     }
-
     pbar = tqdm(total=len(model_name)*len(corpuses)*len(num_topics))
     for name in model_name:
         for corpus_type, corpus in corpuses.items():
             for k in num_topics:
-                score = compute_coherence_score(name, corpus, id2word, lemma_text, 
-                                                hyperparameters={'num_topics': k})
+                score = compute_coherence_score(name, corpus, id2word, lemma_text, hyperparameters={'num_topics': k})
+                
                 # add model results to dataframe
                 select_algo_results['model name'].append(name)
                 select_algo_results['corpus'].append(corpus_type)
@@ -106,10 +99,9 @@ def evaluate_topic_models(model_name, corpuses, num_topics, id2word, lemma_text)
                 
                 # update progress bar
                 pbar.update(1)
-                
     pbar.close()
-    
     return pd.DataFrame(select_algo_results)
+
 
 def build_top_model(df, corpuses, id2word, random_state=0):
     """Build top model based on coherence score experiment
@@ -138,3 +130,59 @@ def build_top_model(df, corpuses, id2word, random_state=0):
                                   hyperparameters={'num_topics': top_num_topic}, 
                                   random_state=random_state)
     return top_model
+
+def predict(model, processed_text, pred_map):
+    """Get topic model predictions 
+    Parameters:
+        model (gensim topic model object): model for making predictions
+        processed_text (list of tuples): output from a bag of words or tfidf gensim conversion 
+        pred_map (dict): map numerical topic to topic label
+    
+    Returns:
+        mapped_pred (list of tuples): [(topic label 1, proba), (topic label 2, proba)...]
+    """
+    pred = model[processed_text]
+    mapped_pred = [(pred_map[pred_topic], str(round(proba, 2))) for pred_topic, proba in pred]
+    return mapped_pred
+
+def tm_model_predict(processed_df, sentiment):
+    """Loads persisted model and uses the predict function to get topic model predictions
+
+    Parameters:
+        processed_df (pandas dataframe): format is same as to reviews dataframe, just with 
+        an added column denoting the preprocessed version of the text
+        sentiment (str): 'Positive' or 'Negative'
+    
+    Returns:
+        (pandas dataframe): Dataframe in the same format as the reviews dataframe, with an 
+        added columns denoting the predicted topics 
+    """
+    sentiment = sentiment.lower().strip()
+
+    if sentiment not in ['positive', 'negative']:
+        raise Exception('Sentiment should either be positive or negative')
+    
+    sentiment_map = {
+        'positive': {
+            0: 'Food and beverage quality',
+            1: 'Coffee experience and pet preferences'
+        }, 
+        'negative': {
+            0: 'Beverage',
+            1: 'Pet products'
+        }
+    }
+
+    MODEL_SAVE = Path(__file__).parent.parent.parent / 'models'
+
+    if sentiment == 'positive':
+        model = LsiModel.load(f'{MODEL_SAVE}/tm_pos_model')
+    else:
+        model = LsiModel.load(f'{MODEL_SAVE}/tm_neg_model')
+    
+    processed_df['Predicted Topic'] = (
+        processed_df['Preprocessed Text']
+        .apply(lambda x: predict(model, x, sentiment_map[sentiment]))
+    )
+    
+    return processed_df.drop('Preprocessed Text', axis=1)
