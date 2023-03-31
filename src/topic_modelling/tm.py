@@ -1,6 +1,7 @@
 # modelling
 from gensim.models import LdaModel, Nmf, LsiModel, CoherenceModel
 from tqdm import tqdm
+from pathlib import Path
 
 # plotting and data manipulation
 import pandas as pd
@@ -156,23 +157,28 @@ def tm_model_predict(processed_df, sentiment):
         (pandas dataframe): Dataframe in the same format as the reviews dataframe, with an 
         added columns denoting the predicted topics 
     """
+    sentiment = sentiment.lower().strip()
+
+    if sentiment not in ['positive', 'negative']:
+        raise Exception('Sentiment should either be positive or negative')
+    
     sentiment_map = {
-        'Positive': {
+        'positive': {
             0: 'Food and beverage quality',
             1: 'Coffee experience and pet preferences'
         }, 
-        'Negative': {
+        'negative': {
             0: 'Beverage',
             1: 'Pet products'
         }
     }
-    
-    if sentiment not in ['Postive', 'Negative']:
-        raise Exception('Sentiment should either be positive or negative')
-    elif sentiment == 'Positive':
-        model = LsiModel.load('models/tm_pos_model')
+
+    MODEL_SAVE = Path(__file__).parent.parent.parent / 'models'
+
+    if sentiment == 'positive':
+        model = LsiModel.load(f'{MODEL_SAVE}/tm_pos_model')
     else:
-        model = LsiModel.load('models/tm_neg_model')
+        model = LsiModel.load(f'{MODEL_SAVE}/tm_neg_model')
     
     processed_df['Predicted Topic'] = (
         processed_df['Preprocessed Text']
