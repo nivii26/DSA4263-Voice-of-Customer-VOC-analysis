@@ -10,4 +10,11 @@ python-multipart
 uvicorn
 zipfile
 
-# ML Framework
+# NLP packages
+nltk
+gensim
+contractions
+demoji
+
+# Visualization Tools
+pandas-profiling
