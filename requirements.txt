@@ -4,6 +4,11 @@ numpy
 
 # API requirements
 requests
+fastapi
+json
+python-multipart
+uvicorn
+zipfile
 
 # NLP packages
 nltk
