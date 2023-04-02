@@ -1,1 +1,0 @@
-# To contain trained models, predictions, etc. 
