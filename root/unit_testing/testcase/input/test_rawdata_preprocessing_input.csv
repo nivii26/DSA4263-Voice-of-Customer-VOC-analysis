@@ -1,0 +1,9 @@
+Type,Text
+contraction,"I've eaten this before and it is bad, I'll not be buying from them again."
+emoji,My dog feels really satisfied with the food here ??!
+html,<a> Food here is really good </a>
+digits_word,"I made a b00king here and the food is really bad, like real bad, wa$te of m0ney indeed. "
+digits,I paid 200 dollars to have a meal here and it is a waste of money.
+extra_spaces,Will not ever eat here      again   because its bad.
+punctuations,"Trying out different $ punctuations, here. Because/ why! Not?, it is working ( properly ) right &"
+rawdata_preprocessing,"I've eaten this before ??. <a>it was bad</a> not worth the b00king, paid $200 for it    and regretted."
