@@ -119,9 +119,6 @@ def features_sa_train(train_data):
     label = features_df.columns
     features_df['Sentiment'] = train_data['Sentiment']
 
-    # weight the negative sentiment samples by 2
-    features_df.loc[features_df['Sentiment'] == 'negative',label] *= 2
-
     return features_df, word2vec_model, tfidf, pca_emb, pca_tfidf
 
 def features_sa_test(test_data,word2vec_model, tfidf, pca_emb, pca_tfidf):
@@ -164,8 +161,6 @@ def features_sa_test(test_data,word2vec_model, tfidf, pca_emb, pca_tfidf):
     temp = pd.DataFrame(test_data['Sentiment'].tolist(),columns=["Sentiment"])
     features_df = pd.concat([features_df, temp], axis=1)
     
-    # weight the negative sentiment samples by 2
-    features_df.loc[features_df['Sentiment'] == 'negative',label] *= 2
     return features_df,test_data["Sentiment"]
 
 
