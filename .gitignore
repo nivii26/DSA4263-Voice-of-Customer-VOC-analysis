@@ -8,7 +8,8 @@
 *.env
 
 # Data
-*.csv
+root/data/*/*.csv
+root/src/*/*.csv
 
 # NLP
 pos_wv
