@@ -48,7 +48,7 @@ def generate_predictions(RAW_DF, CURRENT_TIME, SAVE=True):
     3. tm_pos_pred: CSV file containing a DataFrame for negative sentiments ["Time", "Text", "Predicted Sentiment", "Predicted Topic"]
     """
     # Clean Data
-    CLEANED_DF = rawdata_preprocessing(RAW_DF)
+    CLEANED_DF = rawdata_preprocessing(RAW_DF, CURRENT_TIME, SAVE)
     # SA Preprocessing
     SA_PROCESSED_DF =  sa_preprocessing(CLEANED_DF)
     # SA Predictions
@@ -59,14 +59,14 @@ def generate_predictions(RAW_DF, CURRENT_TIME, SAVE=True):
     TM_POS_PRED_DF = tm_model_predict(TM_POS_DF, "Positive")
     TM_NEG_PRED_DF = tm_model_predict(TM_NEG_DF, "Negative")
     if SAVE:
-        RAW_DF.to_csv(fr"../data/raw/{CURRENT_TIME}_RAW_DF.csv")
-        CLEANED_DF.to_csv(fr"../data/processed/{CURRENT_TIME}_CLEANED_DF.csv")
-        SA_PROCESSED_DF.to_csv(fr"./data/sa/{CURRENT_TIME}_SA_PROCESSED_DF.csv")
-        SA_PREDICTIONS_DF.to_csv(fr"./data/sa/{CURRENT_TIME}_SA_PRED_DF.csv")
-        TM_POS_DF.to_csv(fr"./data/tm/{CURRENT_TIME}_TM_POS_DF.csv")
-        TM_NEG_DF.to_csv(fr"./data/tm/{CURRENT_TIME}_TM_NEG_DF.csv")
-        TM_POS_PRED_DF.to_csv(fr"./data/tm/{CURRENT_TIME}_TM_POS_PRED_DF.csv")
-        TM_NEG_PRED_DF.to_csv(fr"./data/tm/{CURRENT_TIME}_TM_NEG_PRED_DF.csv")
+        RAW_DF.to_csv(fr"../data/raw/{CURRENT_TIME}_RAW_DF.csv", index=False)
+        CLEANED_DF.to_csv(fr"../data/processed/{CURRENT_TIME}_CLEANED_DF.csv", index=False)
+        SA_PROCESSED_DF.to_csv(fr"./data/sa/{CURRENT_TIME}_SA_PROCESSED_DF.csv", index=False)
+        SA_PREDICTIONS_DF.to_csv(fr"./data/sa/{CURRENT_TIME}_SA_PRED_DF.csv", index=False)
+        TM_POS_DF.to_csv(fr"./data/tm/{CURRENT_TIME}_TM_POS_DF.csv", index=False)
+        TM_NEG_DF.to_csv(fr"./data/tm/{CURRENT_TIME}_TM_NEG_DF.csv", index=False)
+        TM_POS_PRED_DF.to_csv(fr"./data/tm/{CURRENT_TIME}_TM_POS_PRED_DF.csv", index=False)
+        TM_NEG_PRED_DF.to_csv(fr"./data/tm/{CURRENT_TIME}_TM_NEG_PRED_DF.csv", index=False)
     return SA_PREDICTIONS_DF, TM_POS_PRED_DF, TM_NEG_PRED_DF
 
 # Retrieving results
