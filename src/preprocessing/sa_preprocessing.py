@@ -155,13 +155,8 @@ def features_sa_test(test_data,word2vec_model, tfidf, pca_emb, pca_tfidf):
 
     # add the TF-IDF features to the feature matrix DataFrame
     features_df = pd.concat([pca_df_tfidf, pca_df_emb], axis=1)
-
-    # add the label column to the feature matrix DataFrame
-    label = features_df.columns
-    temp = pd.DataFrame(test_data['Sentiment'].tolist(),columns=["Sentiment"])
-    features_df = pd.concat([features_df, temp], axis=1)
     
-    return features_df,test_data["Sentiment"]
+    return features_df
 
 
 if __name__ == "__main__":
