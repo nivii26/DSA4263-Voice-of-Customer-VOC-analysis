@@ -2,9 +2,10 @@ import os
 import pandas as pd
 import zipfile
 
-from ..data.processed import rawdata_preprocessing
-from .preprocessing import tm_preprocessing #,sa_preprocessing
-from .model import sa_model_predict, tm_model_predict
+from ..data.rawdata_preprocessing import rawdata_preprocessing
+from .preprocessing import tm_preprocess, sa_preprocess
+from .sentiment_analysis.sa import sa_model_predict
+from .topic_modelling.tm import tm_model_predict
 
 def zip_preprocess(zip_file, expected_columns):
     """
@@ -50,11 +51,11 @@ def generate_predictions(RAW_DF, CURRENT_TIME, SAVE=True):
     # Clean Data
     CLEANED_DF = rawdata_preprocessing(RAW_DF, CURRENT_TIME, SAVE)
     # SA Preprocessing
-    SA_PROCESSED_DF =  sa_preprocessing(CLEANED_DF)
+    SA_PROCESSED_DF =  sa_preprocess(CLEANED_DF)
     # SA Predictions
     SA_PREDICTIONS_DF = sa_model_predict(SA_PROCESSED_DF)
     # TM Preprocessing
-    TM_POS_DF, TM_NEG_DF = tm_preprocessing(SA_PREDICTIONS_DF)
+    TM_POS_DF, TM_NEG_DF = tm_preprocess(SA_PREDICTIONS_DF)
     # TM Predictions
     TM_POS_PRED_DF = tm_model_predict(TM_POS_DF, "Positive")
     TM_NEG_PRED_DF = tm_model_predict(TM_NEG_DF, "Negative")

@@ -39,6 +39,18 @@ def remove_punctuations(text):
 def remove_extra_spaces(text):
 	return re.sub(' +',' ', text)
 
+def preprocess_text_flair(reviewText):
+	"""
+	Cleans Text Data
+	Input: 
+	reviewText (String)
+	Output:
+	reviewText (String)
+	"""
+	# Remove html
+	reviewText = remove_html(reviewText)
+	return reviewText
+
 def preprocess_text(reviewText):
 	"""
 	Cleans Text Data
@@ -96,6 +108,7 @@ if __name__ == "__main__":
 	os.chdir(r"./root/data")
 	current_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
 	final_cleaned_data = pd.DataFrame(columns=["Sentiment", "Time", "Text"])
+	final_cleaned_data_flair = pd.DataFrame(columns=["Sentiment", "Time", "Text"])
 	
 	for file in os.listdir(r"./raw"):
 		if file.endswith(".csv"):
@@ -110,10 +123,16 @@ if __name__ == "__main__":
 
 			## Clean the data
 			cleaned_data = raw_data.dropna().drop_duplicates()
+			cleaned_data_flair = raw_data.dropna().drop_duplicates()
+			
 			## Preprocess the Review Column
 			cleaned_data["Text"] = cleaned_data["Text"].apply(preprocess_text)
+			cleaned_data_flair["Text"] = cleaned_data_flair["Text"].apply(preprocess_text_flair)
 
 			## Combine all the cleaned datasets
 			final_cleaned_data = pd.concat([final_cleaned_data, cleaned_data])
+			final_cleaned_data_flair = pd.concat([final_cleaned_data_flair, cleaned_data_flair])
+
 
 	final_cleaned_data.to_csv(fr"./processed/{current_time}_CLEANED_DF.csv", index = False)
+	final_cleaned_data_flair.to_csv(f"../../src/data/sa/CLEANED_DATA_flair.csv", index = False)

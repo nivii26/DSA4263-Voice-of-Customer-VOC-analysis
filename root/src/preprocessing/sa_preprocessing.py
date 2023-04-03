@@ -20,9 +20,6 @@ nltk.download('punkt')
 nltk.download('wordnet')
 nltk.download('stopwords')
 
-
-
-
 def sa_preprocess(text):
     # convert to lowercase
     text = text.lower()
