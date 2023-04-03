@@ -14,20 +14,44 @@ from sklearn.preprocessing import StandardScaler
 from imblearn.over_sampling import RandomOverSampler
 import datetime
 import joblib
+from ydata_profiling import ProfileReport
+import contractions
+import demoji
+import string
+
 
 # download necessary NLTK data (only need to run this once)
 nltk.download('punkt')
 nltk.download('wordnet')
 nltk.download('stopwords')
 
-
-
+def preprocess_text(reviewText):
+	"""
+	Cleans Text Data
+	Input: 
+	reviewText (String)
+	Output:
+	reviewText (String)
+	"""
+	# Change contractions to words
+	reviewText = " ".join(contractions.fix(word) for word in reviewText.split())
+	# Remove emojis
+	reviewText = demoji.replace(reviewText, "")
+	# Remove html
+	reviewText = re.sub(r"<[^>]+>", " ", reviewText)
+	# To Lower Case
+	reviewText = reviewText.lower()
+	# Words containing digits
+	reviewText = re.sub('\w*\d\w*','', reviewText)
+	# Remove digits
+	reviewText = re.sub("[^a-zA-Z]+", " ", reviewText)
+	# Remove Extra Spaces
+	reviewText = re.sub(' +',' ', reviewText)
+	# Remove punctuations
+	reviewText = re.sub('[%s]' % re.escape(string.punctuation), '', reviewText)
+	return reviewText
 
 def sa_preprocess(text):
-    # convert to lowercase
-    text = text.lower()
-    # remove non-alphabetic characters
-    text = re.sub(r'[^a-z]', ' ', text)
     # tokenize the text into words
     tokens = word_tokenize(text)
     # remove stopwords
@@ -39,21 +63,10 @@ def sa_preprocess(text):
     return tokens
 
 
-def over_sampling(train_data):
-    # over sampling
-    ros = RandomOverSampler(sampling_strategy='minority')
-    X = train_data['Text'].values.reshape(-1, 1)
-    y = train_data['Sentiment']
-    X_resampled, y_resampled = ros.fit_resample(X, y)
-    train_data = pd.DataFrame({'Text': X_resampled.ravel(), 'Sentiment': y_resampled})
-    return train_data
-
 # Function to augment negative training data
 def augment_train(train_data):
   positive_texts = train_data[train_data['Sentiment'] == 'positive']['Text'].tolist()
   negative_texts = train_data[train_data['Sentiment'] == 'negative']['Text'].tolist()
-
-
   # Over-sample negative training examples using nlp-aug
   aug = naw.SynonymAug()
   augmented_texts = aug.augment(negative_texts, n=len(negative_texts))
@@ -65,8 +78,66 @@ def augment_train(train_data):
 
   return train_data
 
-def features_sa_train(train_data):
-    # apply the augmentation function to the preprocessed text data
+def PREPROCESS_XGB(test_data):
+    # load model for test data
+    word2vec_model = Word2Vec.load('../../models/w2v_model')
+    tfidf = joblib.load('../../models/tfidf_sa.pkl')
+    pca_emb = joblib.load('../../models/pca_emb.pkl')
+    pca_tfidf = joblib.load('../../models/pca_tfidf.pkl')
+
+    # apply the preprocessing function to the text data
+    test_data['Text'] = test_data['Text'].apply(sa_preprocess)
+
+
+    ## Features
+    # train a Word2Vec model on the preprocessed text data
+    test_embeddings = test_data['Text'].apply(lambda x: np.mean([word2vec_model.wv[Text] for Text in x if Text in word2vec_model.wv.key_to_index], axis=0))
+
+    # create a new DataFrame for the feature matrix
+    features_df = pd.DataFrame(test_embeddings.tolist(), index=test_embeddings.index)
+
+
+    # perform PCA with n_components set to retain 98% of variance
+    features_emb_pca = pca_emb.transform(features_df)
+
+    # create a new DataFrame for the PCA features
+    pca_emb_cols = [f"PC_emb{i+1}" for i in range(features_emb_pca.shape[1])]
+    pca_df_emb = pd.DataFrame(features_emb_pca, columns=pca_emb_cols)
+    
+
+    # obtain the TF-IDF feature matrix for the training and test data
+    test_matrix = tfidf.transform(test_data['Text'].apply(lambda x: ' '.join(x))).toarray()
+    tfidf_features_df = pd.DataFrame(test_matrix, columns=tfidf.get_feature_names_out())
+
+    # perform PCA with n_components set to retain 95% of variance
+    features_tfidf_pca = pca_tfidf.transform(tfidf_features_df)
+
+    # create a new DataFrame for the PCA features
+    pca_tfidf_cols = [f"PC_tfidf{i+1}" for i in range(features_tfidf_pca.shape[1])]
+    pca_df_tfidf = pd.DataFrame(features_tfidf_pca, columns=pca_tfidf_cols)
+
+    # add the TF-IDF features to the feature matrix DataFrame
+    features_df = pd.concat([pca_df_tfidf, pca_df_emb], axis=1)
+
+    return features_df
+
+def remove_html(reviewText):
+    # Remove html
+	reviewText = re.sub(r"<[^>]+>", " ", reviewText)
+	return reviewText
+
+def PREPROCESS_FLAIR(raw_data):
+	final_cleaned_data_flair = pd.DataFrame(columns=["Sentiment", "Time", "Text"])
+    ## Clean the data
+	cleaned_data_flair = raw_data.dropna().drop_duplicates()
+	## Preprocess the Review Column
+	cleaned_data_flair["Text"] = cleaned_data_flair["Text"].apply(remove_html)
+	## Combine all the cleaned datasets
+	final_cleaned_data_flair = pd.concat([final_cleaned_data_flair, cleaned_data_flair])
+	return final_cleaned_data_flair
+
+def SA_PREPROCESS_TRAIN(train_data):
+   # apply the augmentation function to the preprocessed text data
     train_data = augment_train(train_data)
     print("Shape after augmenting negative training samples: ", train_data.shape)
 
@@ -121,42 +192,18 @@ def features_sa_train(train_data):
 
     return features_df, word2vec_model, tfidf, pca_emb, pca_tfidf
 
-def features_sa_test(test_data,word2vec_model, tfidf, pca_emb, pca_tfidf):
-    # apply the preprocessing function to the text data
-    test_data['Text'] = test_data['Text'].apply(sa_preprocess)
+def SA_PREPROCESS_TEST(raw_data):
 
+    test_data = raw_data.dropna().drop_duplicates()
+    test_data["Text"] = test_data["Text"].apply(preprocess_text)
+    cleaned_data = pd.DataFrame(columns=["Sentiment", "Time", "Text"])
+    cleaned_data = pd.concat([cleaned_data, test_data])
 
-    ## Features
-    # train a Word2Vec model on the preprocessed text data
-    test_embeddings = test_data['Text'].apply(lambda x: np.mean([word2vec_model.wv[Text] for Text in x if Text in word2vec_model.wv.key_to_index], axis=0))
+    SA_PROCESSED_DF_XGB = PREPROCESS_XGB(cleaned_data)
+    SA_PROCESSED_DF_FLAIR = PREPROCESS_FLAIR(raw_data)
 
-    # create a new DataFrame for the feature matrix
-    features_df = pd.DataFrame(test_embeddings.tolist(), index=test_embeddings.index)
+    return SA_PROCESSED_DF_XGB, SA_PROCESSED_DF_FLAIR
 
-
-    # perform PCA with n_components set to retain 98% of variance
-    features_emb_pca = pca_emb.transform(features_df)
-
-    # create a new DataFrame for the PCA features
-    pca_emb_cols = [f"PC_emb{i+1}" for i in range(features_emb_pca.shape[1])]
-    pca_df_emb = pd.DataFrame(features_emb_pca, columns=pca_emb_cols)
-    
-
-    # obtain the TF-IDF feature matrix for the training and test data
-    test_matrix = tfidf.transform(test_data['Text'].apply(lambda x: ' '.join(x))).toarray()
-    tfidf_features_df = pd.DataFrame(test_matrix, columns=tfidf.get_feature_names_out())
-
-    # perform PCA with n_components set to retain 95% of variance
-    features_tfidf_pca = pca_tfidf.transform(tfidf_features_df)
-
-    # create a new DataFrame for the PCA features
-    pca_tfidf_cols = [f"PC_tfidf{i+1}" for i in range(features_tfidf_pca.shape[1])]
-    pca_df_tfidf = pd.DataFrame(features_tfidf_pca, columns=pca_tfidf_cols)
-
-    # add the TF-IDF features to the feature matrix DataFrame
-    features_df = pd.concat([pca_df_tfidf, pca_df_emb], axis=1)
-    
-    return features_df
 
 
 if __name__ == "__main__":
@@ -168,13 +215,24 @@ if __name__ == "__main__":
         if file.endswith(".csv"):
             new_data = pd.read_csv(rf"../../data/processed/{file}")
             master_data = pd.concat([master_data, new_data])
+
+    for file in os.listdir(r"../../data/raw"):
+        if file.endswith(".csv"):
+            raw_data = pd.read_csv(rf"../../data/raw/{file}")
+
     
-    # process data and feature engineering
-    train_feature, word2vec_model, tfidf, pca_emb, pca_tfidf = features_sa_train(master_data)
+    # process data and feature engineering for training data
+    train_feature, word2vec_model, tfidf, pca_emb, pca_tfidf = SA_PREPROCESS_TRAIN(master_data)
 
     # Saving the model and data
     word2vec_model.save('../../models/w2v_model')
-    joblib.dump(tfidf, '../../models/tfidf_sa,pkl')
-    joblib.dump(pca_emb, '../../models/pca_emb')
-    joblib.dump(pca_tfidf, '../../models/pca_tfidf')
+    joblib.dump(tfidf, '../../models/tfidf_sa.pkl')
+    joblib.dump(pca_emb, '../../models/pca_emb.pkl')
+    joblib.dump(pca_tfidf, '../../models/pca_tfidf.pkl')
     train_feature.to_csv("../data/sa/features_train_sa.csv", index=False)
+
+
+    ## process data and feature engineering for test data
+    #SA_PROCESSED_DF_XGB, SA_PROCESSED_DF_FLAIR=SA_PREPROCESS_TEST(raw_data)
+    #SA_PROCESSED_DF_XGB.to_csv("../data/sa/features_train_sa_new.csv", index=False)
+    #SA_PROCESSED_DF_FLAIR.to_csv("../data/sa/features_test_sa_new.csv", index=False)
