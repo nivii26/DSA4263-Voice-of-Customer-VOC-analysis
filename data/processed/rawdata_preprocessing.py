@@ -15,13 +15,23 @@ from gensim.parsing.preprocessing import STOPWORDS
 import contractions
 import demoji
 
+def preprocess_text_flair(reviewText):
+	"""
+	Cleans Text Data
+	Input: 
+	reviewText (String)
+	Output:
+	reviewText (String)
+	"""
+	# Remove html
+	reviewText = re.sub(r"<[^>]+>", " ", reviewText)
+	return reviewText
+
 def preprocess_text(reviewText):
 	"""
 	Cleans Text Data
-
 	Input: 
 	reviewText (String)
-
 	Output:
 	reviewText (String)
 	"""
@@ -50,17 +60,16 @@ if __name__ == "__main__":
 	be found under data/processed/reports folder
 	2. Clean ALL csv datasets in the Raw Folder and combine them into 1 cleaned dataframe which is 
 	saved in processed folder with the filename: [datetime of run]_CLEANED_DATA.csv
-
 	Input: 
 	All Raw CSV files in the data/raw directory [NOTE: Columns have to be "Sentiment", "Time", "Text"]
 	#TODO: Streamline Code to Check for the format above 
-
 	Output:
 	Combined cleaned dataset with the filename [datetime of run]_CLEANED_DATA.csv suitable for all NLP tasks
 	"""
 	
 	current_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
 	final_cleaned_data = pd.DataFrame(columns=["Sentiment", "Time", "Text"])
+	final_cleaned_data_flair = pd.DataFrame(columns=["Sentiment", "Time", "Text"])
 	
 	for file in os.listdir(r"../raw"):
 		if file.endswith(".csv"):
@@ -75,10 +84,14 @@ if __name__ == "__main__":
 
 			## Clean the data
 			cleaned_data = raw_data.dropna().drop_duplicates()
+			cleaned_data_flair = raw_data.dropna().drop_duplicates()
 			## Preprocess the Review Column
 			cleaned_data["Text"] = cleaned_data["Text"].apply(preprocess_text)
+			cleaned_data_flair["Text"] = cleaned_data["Text"].apply(preprocess_text_flair)
 
 			## Combine all the cleaned datasets
 			final_cleaned_data = pd.concat([final_cleaned_data, cleaned_data])
+			final_cleaned_data_flair = pd.concat([final_cleaned_data_flair, cleaned_data_flair])
 
 	final_cleaned_data.to_csv(f"{current_time}_CLEANED_DATA.csv", index = False)
+	final_cleaned_data_flair.to_csv(f"../../src/data/sa/CLEANED_DATA_flair.csv", index = False)
