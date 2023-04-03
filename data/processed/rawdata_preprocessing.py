@@ -87,7 +87,7 @@ if __name__ == "__main__":
 			cleaned_data_flair = raw_data.dropna().drop_duplicates()
 			## Preprocess the Review Column
 			cleaned_data["Text"] = cleaned_data["Text"].apply(preprocess_text)
-			cleaned_data_flair["Text"] = cleaned_data["Text"].apply(preprocess_text_flair)
+			cleaned_data_flair["Text"] = cleaned_data_flair["Text"].apply(preprocess_text_flair)
 
 			## Combine all the cleaned datasets
 			final_cleaned_data = pd.concat([final_cleaned_data, cleaned_data])
