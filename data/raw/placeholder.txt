@@ -1,1 +1,1 @@
-To contain raw dataset 'reviews_csv'
+To contain raw dataset equivalent to 'reviews_csv'
