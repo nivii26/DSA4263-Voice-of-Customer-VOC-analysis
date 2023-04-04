@@ -26,7 +26,7 @@ def sa_model_predict(SA_PROCESSED_DF_XGB, SA_PROCESSED_DF_FLAIR):
     flair_prob = []
     flair_sentiments = []
 
-    for review in  SA_PROCESSED_DF_FLAIR['Text'].to_list():
+    for review in SA_PROCESSED_DF_FLAIR['Text'].to_list():
     
         # Convert format of review to Sentence
         sentence = Sentence(review)
@@ -79,4 +79,4 @@ def sa_model_predict(SA_PROCESSED_DF_XGB, SA_PROCESSED_DF_FLAIR):
     results['avg_prob'] = (results['flair_prob'] + results['xgb_prob']) / 2
     results['final_sentiment'] = np.where(results['avg_prob'] > 0.5, 1, 0)
     
-    return results
+    return results # ["final_sentiment"]

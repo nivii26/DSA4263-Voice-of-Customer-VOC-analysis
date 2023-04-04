@@ -2,9 +2,9 @@ import os
 import pandas as pd
 import zipfile
 
-from ..data.processed import rawdata_preprocessing
-from .preprocessing import tm_preprocessing #,sa_preprocessing
-from .model import sa_model_predict, tm_model_predict
+from .preprocessing import TM_PREPROCESS_TEST, SA_PREPROCESS_TEST
+from .model.sa import SA_MODEL_PREDICT
+from .model.tm import TM_MODEL_PREDICT
 
 def zip_preprocess(zip_file, expected_columns):
     """
@@ -43,30 +43,28 @@ def generate_predictions(RAW_DF, CURRENT_TIME, SAVE=True):
     TM -> ./data/tm
 
     Output:
-    1. sa_pred: CSV file containing a DataFrame ["Time", "Text", "Predicted Sentiment"]
-    2. tm_pos_pred: CSV file containing a DataFrame for positive sentiments ["Time", "Text", "Predicted Sentiment", "Predicted Topic"]
-    3. tm_pos_pred: CSV file containing a DataFrame for negative sentiments ["Time", "Text", "Predicted Sentiment", "Predicted Topic"]
+    1. SA_PREDICTIONS_DF: DataFrame ["Time", "Text", "Sentiment"] # Sentiment Values: "positive" or "negative"
+    2. TM_POS_PRED_DF: DataFrame for positive sentiments ["Time", "Text", "Sentiment", "Topic"]
+    3. TM_NEG_PRED_DF: DataFrame for negative sentiments ["Time", "Text", "Sentiment", "Topic"]
     """
-    # Clean Data
-    CLEANED_DF = rawdata_preprocessing(RAW_DF)
     # SA Preprocessing
-    SA_PROCESSED_DF =  sa_preprocessing(CLEANED_DF)
+    SA_PROCESSED_DF_XGB, SA_PROCESSED_DF_FLAIR = SA_PREPROCESS_TEST(RAW_DF)
     # SA Predictions
-    SA_PREDICTIONS_DF = sa_model_predict(SA_PROCESSED_DF)
+    SA_PREDICTIONS_DF = SA_MODEL_PREDICT(SA_PROCESSED_DF_XGB, SA_PROCESSED_DF_FLAIR)
     # TM Preprocessing
-    TM_POS_DF, TM_NEG_DF = tm_preprocessing(SA_PREDICTIONS_DF)
+    TM_POS_DF, TM_NEG_DF = TM_PREPROCESS_TEST(SA_PREDICTIONS_DF) 
     # TM Predictions
-    TM_POS_PRED_DF = tm_model_predict(TM_POS_DF, "Positive")
-    TM_NEG_PRED_DF = tm_model_predict(TM_NEG_DF, "Negative")
+    TM_POS_PRED_DF = TM_MODEL_PREDICT(TM_POS_DF, "Positive")
+    TM_NEG_PRED_DF = TM_MODEL_PREDICT(TM_NEG_DF, "Negative")
     if SAVE:
-        RAW_DF.to_csv(fr"../data/raw/{CURRENT_TIME}_RAW_DF.csv")
-        CLEANED_DF.to_csv(fr"../data/processed/{CURRENT_TIME}_CLEANED_DF.csv")
-        SA_PROCESSED_DF.to_csv(fr"./data/sa/{CURRENT_TIME}_SA_PROCESSED_DF.csv")
-        SA_PREDICTIONS_DF.to_csv(fr"./data/sa/{CURRENT_TIME}_SA_PRED_DF.csv")
-        TM_POS_DF.to_csv(fr"./data/tm/{CURRENT_TIME}_TM_POS_DF.csv")
-        TM_NEG_DF.to_csv(fr"./data/tm/{CURRENT_TIME}_TM_NEG_DF.csv")
-        TM_POS_PRED_DF.to_csv(fr"./data/tm/{CURRENT_TIME}_TM_POS_PRED_DF.csv")
-        TM_NEG_PRED_DF.to_csv(fr"./data/tm/{CURRENT_TIME}_TM_NEG_PRED_DF.csv")
+        RAW_DF.to_csv(fr"../data/raw/{CURRENT_TIME}_RAW_DF.csv", index=False)
+        SA_PROCESSED_DF_XGB.to_csv(fr"./data/sa/{CURRENT_TIME}_SA_PROCESSED_DF_XGB.csv", index=False)
+        SA_PROCESSED_DF_FLAIR.to_csv(fr"./data/sa/{CURRENT_TIME}_SA_PROCESSED_DF_FLAIR.csv", index=False)
+        SA_PREDICTIONS_DF.to_csv(fr"./data/sa/{CURRENT_TIME}_SA_PRED_DF.csv", index=False)
+        TM_POS_DF.to_csv(fr"./data/tm/{CURRENT_TIME}_TM_POS_DF.csv", index=False)
+        TM_NEG_DF.to_csv(fr"./data/tm/{CURRENT_TIME}_TM_NEG_DF.csv", index=False)
+        TM_POS_PRED_DF.to_csv(fr"./data/tm/{CURRENT_TIME}_TM_POS_PRED_DF.csv", index=False)
+        TM_NEG_PRED_DF.to_csv(fr"./data/tm/{CURRENT_TIME}_TM_NEG_PRED_DF.csv", index=False)
     return SA_PREDICTIONS_DF, TM_POS_PRED_DF, TM_NEG_PRED_DF
 
 # Retrieving results

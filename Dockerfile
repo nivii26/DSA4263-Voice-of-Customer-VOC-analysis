@@ -15,6 +15,6 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 # copy all scripts
 COPY . /app
 
-WORKDIR /src
+WORKDIR /root/src
 
 ENTRYPOINT ["uvicorn", "main:app", "--port", "5000", "--host", "0.0.0.0"]
