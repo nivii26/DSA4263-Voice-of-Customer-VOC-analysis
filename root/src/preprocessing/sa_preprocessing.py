@@ -166,7 +166,7 @@ def SA_PREPROCESS_TRAIN(train_data):
 	joblib.dump(tfidf, '../../models/sa/tfidf_sa.pkl')
 	joblib.dump(pca_emb, '../../models/sa/pca_emb.pkl')
 	joblib.dump(pca_tfidf, '../../models/sa/pca_tfidf.pkl')
-	# train_feature.to_csv("../data/sa/features_train_sa.csv", index=False)
+	# features_df.to_csv("../data/sa/features_train_sa.csv", index=False)
 	return features_df
 
 def SA_PREPROCESS_TEST(raw_data):
