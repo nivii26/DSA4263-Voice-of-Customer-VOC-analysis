@@ -69,7 +69,7 @@ def preprocess_text(reviewText):
 	reviewText = remove_extra_spaces(reviewText)
 	return reviewText
 
-def preprocess_raw(RAW_DF, CURRENT_TIME, SAVE):
+def PREPROCESS_RAW(RAW_DF, CURRENT_TIME="", SAVE=False):
 	if SAVE:
 		ProfileReport(RAW_DF).to_file(rf'./processed/report/{CURRENT_TIME}_DATA_REPORT.html')
 	## Clean the data
@@ -93,24 +93,24 @@ if __name__ == "__main__":
 	Output:
 	Combined cleaned dataset with the filename [datetime of run]_CLEANED_DATA.csv suitable for all NLP tasks
 	"""
-	os.chdir(r"./root/data")
+	os.chdir(r"./root/src/preprocessing")
 	current_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
 	final_cleaned_data = pd.DataFrame(columns=["Sentiment", "Time", "Text"])
 	
-	for file in os.listdir(r"./raw"):
+	for file in os.listdir(r"../../data/raw"):
 		if file.endswith(".csv"):
 			# Loading of Data
-			raw_data = pd.read_csv(rf"./raw/{file}")
+			raw_data = pd.read_csv(rf"../../data/raw/{file}")
 			
 			# Basic Exploratory Data Analysis (EDA)
 			## Generate a report on the data (missing, duplicates)
-			if "report" not in os.listdir(r"./processed"):
-				os.makedirs(r"./processed/report")
-			ProfileReport(raw_data).to_file(rf'./processed/report/{current_time}_DATA_REPORT.html')
+			if "report" not in os.listdir(r"../../data/processed"):
+				os.makedirs(r"../../data/processed/report")
+			ProfileReport(raw_data).to_file(rf'../../data/processed/report/{current_time}_DATA_REPORT.html')
 
-			cleaned_data = preprocess_raw(raw_data, current_time, False)
+			cleaned_data = PREPROCESS_RAW(raw_data, current_time, False)
 
 			## Combine all the cleaned datasets
 			final_cleaned_data = pd.concat([final_cleaned_data, cleaned_data])
 
-	final_cleaned_data.to_csv(fr"./processed/{current_time}_CLEANED_DF.csv", index = False)
+	final_cleaned_data.to_csv(fr"../../data/processed/{current_time}_CLEANED_DF.csv", index = False)

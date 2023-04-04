@@ -24,7 +24,7 @@ def tm_preprocess_text(reviewText, min_len=2, max_len=15):
 	lemmaText = [Lemmatizer.lemmatize(word) for word in tokenizeText]
 	return lemmaText
 
-def tm_preprocess_train(train_data, min_len=2, max_len=15):
+def TM_PREPROCESS_TRAIN(train_data, min_len=2, max_len=15):
 	positive_data = train_data.loc[train_data["Sentiment"] == "positive", ["Text"]]
 	negative_data = train_data.loc[train_data["Sentiment"] == "negative", ["Text"]]
 	positive_data["Text"] = positive_data["Text"].apply(lambda x: tm_preprocess_text(x, min_len, max_len))
@@ -65,7 +65,7 @@ def tm_preprocess_train(train_data, min_len=2, max_len=15):
 	
 	return [pos_dict, neg_dict, pos_corpus, neg_corpus, pos_tfidf, neg_tfidf, pos_tfidf_corpus, neg_tfidf_corpus]
 
-def tm_preprocess_test(test_data, min_len=2, max_len=15):
+def TM_PREPROCESS_TEST(test_data, min_len=2, max_len=15):
 	test_data["Sentiment"] = test_data["Sentiment"].apply(lambda x: x.lower().strip())
 	test_data["Sentiment"] = test_data["Sentiment"].apply(lambda x: x.lower().strip())
 	positive_data = test_data.loc[test_data["Sentiment"] == "positive"]
@@ -86,7 +86,7 @@ if __name__ == "__main__":
 			new_data = pd.read_csv(rf"../../data/processed/{file}")
 			master_data = pd.concat([master_data, new_data])
 
-	pos_dict, neg_dict, pos_corpus, neg_corpus, pos_tfidf, neg_tfidf, pos_tfidf_corpus, neg_tfidf_corpus = tm_preprocess_train(master_data)
+	pos_dict, neg_dict, pos_corpus, neg_corpus, pos_tfidf, neg_tfidf, pos_tfidf_corpus, neg_tfidf_corpus = TM_PREPROCESS_TRAIN(master_data)
 
 	# Saving the corpus and dict
 	"""
