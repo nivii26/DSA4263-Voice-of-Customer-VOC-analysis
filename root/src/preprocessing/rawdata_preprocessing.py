@@ -39,18 +39,6 @@ def remove_punctuations(text):
 def remove_extra_spaces(text):
 	return re.sub(' +',' ', text)
 
-def preprocess_text_flair(reviewText):
-	"""
-	Cleans Text Data
-	Input: 
-	reviewText (String)
-	Output:
-	reviewText (String)
-	"""
-	# Remove html
-	reviewText = remove_html(reviewText)
-	return reviewText
-
 def preprocess_text(reviewText):
 	"""
 	Cleans Text Data
@@ -81,11 +69,11 @@ def preprocess_text(reviewText):
 	reviewText = remove_extra_spaces(reviewText)
 	return reviewText
 
-def rawdata_preprocessing(RAW_DF, CURRENT_TIME, SAVE):
+def preprocess_raw(RAW_DF, CURRENT_TIME, SAVE):
 	if SAVE:
-		ProfileReport(RAW_DF).to_file(fr"../data/processed/report/{CURRENT_TIME}_DATA_REPORT.html")
+		ProfileReport(RAW_DF).to_file(rf'./processed/report/{CURRENT_TIME}_DATA_REPORT.html')
 	## Clean the data
-	CLEANED_DF = raw_data.dropna().drop_duplicates()
+	CLEANED_DF = RAW_DF.dropna().drop_duplicates()
 	## Preprocess the Review Column
 	CLEANED_DF["Text"] = CLEANED_DF["Text"].apply(preprocess_text)
 	return CLEANED_DF
@@ -108,7 +96,6 @@ if __name__ == "__main__":
 	os.chdir(r"./root/data")
 	current_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
 	final_cleaned_data = pd.DataFrame(columns=["Sentiment", "Time", "Text"])
-	final_cleaned_data_flair = pd.DataFrame(columns=["Sentiment", "Time", "Text"])
 	
 	for file in os.listdir(r"./raw"):
 		if file.endswith(".csv"):
@@ -121,18 +108,9 @@ if __name__ == "__main__":
 				os.makedirs(r"./processed/report")
 			ProfileReport(raw_data).to_file(rf'./processed/report/{current_time}_DATA_REPORT.html')
 
-			## Clean the data
-			cleaned_data = raw_data.dropna().drop_duplicates()
-			cleaned_data_flair = raw_data.dropna().drop_duplicates()
-			
-			## Preprocess the Review Column
-			cleaned_data["Text"] = cleaned_data["Text"].apply(preprocess_text)
-			cleaned_data_flair["Text"] = cleaned_data_flair["Text"].apply(preprocess_text_flair)
+			cleaned_data = preprocess_raw(raw_data, current_time, False)
 
 			## Combine all the cleaned datasets
 			final_cleaned_data = pd.concat([final_cleaned_data, cleaned_data])
-			final_cleaned_data_flair = pd.concat([final_cleaned_data_flair, cleaned_data_flair])
-
 
 	final_cleaned_data.to_csv(fr"./processed/{current_time}_CLEANED_DF.csv", index = False)
-	final_cleaned_data_flair.to_csv(f"../../src/data/sa/CLEANED_DATA_flair.csv", index = False)

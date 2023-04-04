@@ -6,6 +6,7 @@ I.E: In other python files, you can do the following:
 from data import preprocessed_data # Assuming preprocessed_data variable 
 exist
 """
-from .tm_preprocessing import tm_preprocess
-from .sa_preprocessing import sa_preprocess
+from .tm_preprocessing import tm_preprocess_test
+from .sa_preprocessing import sa_preprocess_test
+from .rawdata_preprocessing import preprocess_raw
 

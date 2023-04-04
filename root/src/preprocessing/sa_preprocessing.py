@@ -35,7 +35,6 @@ def sa_preprocess(text):
     tokens = [lemmatizer.lemmatize(word) for word in tokens]
     return tokens
 
-
 def over_sampling(train_data):
     # over sampling
     ros = RandomOverSampler(sampling_strategy='minority')
@@ -62,7 +61,7 @@ def augment_train(train_data):
 
   return train_data
 
-def features_sa_train(train_data):
+def sa_preprocess_train(train_data):
     # apply the augmentation function to the preprocessed text data
     train_data = augment_train(train_data)
     print("Shape after augmenting negative training samples: ", train_data.shape)
@@ -118,10 +117,15 @@ def features_sa_train(train_data):
 
     return features_df, word2vec_model, tfidf, pca_emb, pca_tfidf
 
-def features_sa_test(test_data,word2vec_model, tfidf, pca_emb, pca_tfidf):
+def sa_preprocess_test(test_data):
+    # TODO: Loading of models from directory 
+    # word2vec_model = 
+    # tfidf = 
+    # pca_emb = 
+    # pca_tfidf = 
+
     # apply the preprocessing function to the text data
     test_data['Text'] = test_data['Text'].apply(sa_preprocess)
-
 
     ## Features
     # train a Word2Vec model on the preprocessed text data
@@ -158,12 +162,12 @@ def features_sa_test(test_data,word2vec_model, tfidf, pca_emb, pca_tfidf):
     temp = pd.DataFrame(test_data['Sentiment'].tolist(),columns=["Sentiment"])
     features_df = pd.concat([features_df, temp], axis=1)
     
-    return features_df,test_data["Sentiment"]
+    return features_df, test_data["Sentiment"]
 
 
 if __name__ == "__main__":
     current_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
-    master_data = pd.DataFrame(columns=["Text"])
+    master_data = pd.DataFrame(columns=["Text", "Sentiment"])
 
     # Load Data
     for file in os.listdir(r"../../data/processed"):
@@ -172,7 +176,7 @@ if __name__ == "__main__":
             master_data = pd.concat([master_data, new_data])
     
     # process data and feature engineering
-    train_feature, word2vec_model, tfidf, pca_emb, pca_tfidf = features_sa_train(master_data)
+    train_feature, word2vec_model, tfidf, pca_emb, pca_tfidf = sa_preprocess_train(master_data)
 
     # Saving the model and data
     word2vec_model.save('../../models/w2v_model')

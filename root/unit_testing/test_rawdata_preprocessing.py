@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 
-from ..data.rawdata_preprocessing import *
+from ..src.preprocessing.rawdata_preprocessing import *
 
 # contraction
 def test_remove_contraction(in_df, out_df):
