@@ -164,8 +164,17 @@ def tm_model_predict(processed_df, sentiment):
     
     sentiment_map = {
         'positive': {
-            0: 'Food and beverage quality',
-            1: 'Coffee experience and pet preferences'
+            0: 'Food condiments'
+            1: 'Product quality and affordability'
+            2: 'Tea flavors and preparation'
+            3: 'Drinks and flavors'
+            4: 'Positive product reviews'
+            5: 'Food products and nutrition'
+            6: 'Healthy snack options'
+            7: 'Product value and satisfaction'
+            8: 'Coffee flavors and preferences'
+            9: 'Preferences'
+            10: 'Pet food'
         }, 
         'negative': {
             0: 'Beverage',
@@ -176,7 +185,7 @@ def tm_model_predict(processed_df, sentiment):
     MODEL_SAVE = Path(__file__).parent.parent.parent / 'models'
 
     if sentiment == 'positive':
-        model = LsiModel.load(f'{MODEL_SAVE}/tm_pos_model')
+        model = Nmf.load(f'{MODEL_SAVE}/tm_pos_model')
     else:
         model = LsiModel.load(f'{MODEL_SAVE}/tm_neg_model')
     
