@@ -188,10 +188,10 @@ if __name__ == "__main__":
 	train_feature, word2vec_model, tfidf, pca_emb, pca_tfidf = SA_PREPROCESS_TRAIN(master_data)
 
 	# Saving the model and data
-	word2vec_model.save('../../models/w2v_model')
-	joblib.dump(tfidf, '../../models/tfidf_sa.pkl')
-	joblib.dump(pca_emb, '../../models/pca_emb.pkl')
-	joblib.dump(pca_tfidf, '../../models/pca_tfidf.pkl')
+	word2vec_model.save('../../models/sa/w2v_model')
+	joblib.dump(tfidf, '../../models/sa/tfidf_sa.pkl')
+	joblib.dump(pca_emb, '../../models/sa/pca_emb.pkl')
+	joblib.dump(pca_tfidf, '../../models/sa/pca_tfidf.pkl')
 	train_feature.to_csv("../data/sa/features_train_sa.csv", index=False)
 
 	# process data and feature engineering for test data

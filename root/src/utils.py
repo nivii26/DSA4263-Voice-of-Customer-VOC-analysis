@@ -43,7 +43,7 @@ def generate_predictions(RAW_DF, CURRENT_TIME, SAVE=True):
     TM -> ./data/tm
 
     Output:
-    1. SA_PREDICTIONS_DF: DataFrame ["Time", "Text", "Sentiment"]
+    1. SA_PREDICTIONS_DF: DataFrame ["Time", "Text", "Sentiment"] # Sentiment Values: "positive" or "negative"
     2. TM_POS_PRED_DF: DataFrame for positive sentiments ["Time", "Text", "Sentiment", "Topic"]
     3. TM_NEG_PRED_DF: DataFrame for negative sentiments ["Time", "Text", "Sentiment", "Topic"]
     """
@@ -58,7 +58,6 @@ def generate_predictions(RAW_DF, CURRENT_TIME, SAVE=True):
     TM_NEG_PRED_DF = TM_MODEL_PREDICT(TM_NEG_DF, "Negative")
     if SAVE:
         RAW_DF.to_csv(fr"../data/raw/{CURRENT_TIME}_RAW_DF.csv", index=False)
-        
         SA_PROCESSED_DF_XGB.to_csv(fr"./data/sa/{CURRENT_TIME}_SA_PROCESSED_DF_XGB.csv", index=False)
         SA_PROCESSED_DF_FLAIR.to_csv(fr"./data/sa/{CURRENT_TIME}_SA_PROCESSED_DF_FLAIR.csv", index=False)
         SA_PREDICTIONS_DF.to_csv(fr"./data/sa/{CURRENT_TIME}_SA_PRED_DF.csv", index=False)
