@@ -104,6 +104,7 @@ def PREPROCESS_FLAIR(raw_data):
 	final_cleaned_data_flair = pd.concat([final_cleaned_data_flair, cleaned_data_flair])
 	return final_cleaned_data_flair
 
+
 def SA_PREPROCESS_TRAIN(train_data):
 	"""
 	Input: train_data(dataframe) - cleaned data
@@ -160,7 +161,13 @@ def SA_PREPROCESS_TRAIN(train_data):
 	label = features_df.columns
 	features_df['Sentiment'] = train_data['Sentiment']
 	
-	return features_df, word2vec_model, tfidf, pca_emb, pca_tfidf
+	# Saving the model and data
+	word2vec_model.save('../../models/sa/w2v_model')
+	joblib.dump(tfidf, '../../models/sa/tfidf_sa.pkl')
+	joblib.dump(pca_emb, '../../models/sa/pca_emb.pkl')
+	joblib.dump(pca_tfidf, '../../models/sa/pca_tfidf.pkl')
+	# features_df.to_csv("../data/sa/features_train_sa.csv", index=False)
+	return features_df
 
 def SA_PREPROCESS_TEST(raw_data):
 	"""
@@ -185,14 +192,7 @@ if __name__ == "__main__":
 			master_data = pd.concat([master_data, new_data])
 	
 	# process data and feature engineering for training data
-	train_feature, word2vec_model, tfidf, pca_emb, pca_tfidf = SA_PREPROCESS_TRAIN(master_data)
-
-	# Saving the model and data
-	word2vec_model.save('../../models/sa/w2v_model')
-	joblib.dump(tfidf, '../../models/sa/tfidf_sa.pkl')
-	joblib.dump(pca_emb, '../../models/sa/pca_emb.pkl')
-	joblib.dump(pca_tfidf, '../../models/sa/pca_tfidf.pkl')
-	train_feature.to_csv("../data/sa/features_train_sa.csv", index=False)
+	train_feature = SA_PREPROCESS_TRAIN(master_data)
 
 	# process data and feature engineering for test data
 	#SA_PROCESSED_DF_XGB, SA_PROCESSED_DF_FLAIR=SA_PREPROCESS_TEST(raw_data)
