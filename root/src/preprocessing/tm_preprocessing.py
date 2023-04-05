@@ -29,7 +29,7 @@ def TM_PREPROCESS_TRAIN(train_data, min_len=2, max_len=15):
 	# BOW
 	# Create and Save the Dictionary of the Corpus
 	TM_BOW_dict = corpora.Dictionary(train_data["Text"])
-	TM_BOW_corpus = [pos_dict.doc2bow(text) for text in train_data["Text"]]
+	TM_BOW_corpus = [TM_BOW_dict.doc2bow(text) for text in train_data["Text"]]
 
 	# TF_IDF
 	TM_tfidf = models.TfidfModel(TM_BOW_corpus)
@@ -38,7 +38,6 @@ def TM_PREPROCESS_TRAIN(train_data, min_len=2, max_len=15):
 	return [TM_BOW_dict, TM_BOW_corpus, TM_tfidf, TM_tfidf_corpus]
 
 def TM_PREPROCESS_TEST(test_data, min_len=2, max_len=15):
-	test_data["Sentiment"] = test_data["Sentiment"].apply(lambda x: x.lower().strip())
 	test_data["processed_text"] = test_data["Text"].apply(lambda x: tm_preprocess_text(x, min_len, max_len))
 	return test_data
 

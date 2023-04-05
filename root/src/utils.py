@@ -52,20 +52,17 @@ def generate_predictions(RAW_DF, CURRENT_TIME, SAVE=True):
     # SA Predictions
     SA_PREDICTIONS_DF = SA_MODEL_PREDICT(SA_PROCESSED_DF_XGB, SA_PROCESSED_DF_FLAIR)
     # TM Preprocessing
-    TM_POS_DF, TM_NEG_DF = TM_PREPROCESS_TEST(SA_PREDICTIONS_DF) 
+    TM_DF = TM_PREPROCESS_TEST(SA_PREDICTIONS_DF)
     # TM Predictions
-    TM_POS_PRED_DF = TM_MODEL_PREDICT(TM_POS_DF, "Positive")
-    TM_NEG_PRED_DF = TM_MODEL_PREDICT(TM_NEG_DF, "Negative")
+    TM_PREDICTIONS_DF = TM_MODEL_PREDICT(TM_DF)
     if SAVE:
         RAW_DF.to_csv(fr"../data/raw/{CURRENT_TIME}_RAW_DF.csv", index=False)
         SA_PROCESSED_DF_XGB.to_csv(fr"./data/sa/{CURRENT_TIME}_SA_PROCESSED_DF_XGB.csv", index=False)
         SA_PROCESSED_DF_FLAIR.to_csv(fr"./data/sa/{CURRENT_TIME}_SA_PROCESSED_DF_FLAIR.csv", index=False)
         SA_PREDICTIONS_DF.to_csv(fr"./data/sa/{CURRENT_TIME}_SA_PRED_DF.csv", index=False)
-        TM_POS_DF.to_csv(fr"./data/tm/{CURRENT_TIME}_TM_POS_DF.csv", index=False)
-        TM_NEG_DF.to_csv(fr"./data/tm/{CURRENT_TIME}_TM_NEG_DF.csv", index=False)
-        TM_POS_PRED_DF.to_csv(fr"./data/tm/{CURRENT_TIME}_TM_POS_PRED_DF.csv", index=False)
-        TM_NEG_PRED_DF.to_csv(fr"./data/tm/{CURRENT_TIME}_TM_NEG_PRED_DF.csv", index=False)
-    return SA_PREDICTIONS_DF, TM_POS_PRED_DF, TM_NEG_PRED_DF
+        TM_DF.to_csv(fr"./data/tm/{CURRENT_TIME}_TM_DF.csv", index=False)
+        TM_PREDICTIONS_DF.to_csv(fr"./data/tm/{CURRENT_TIME}_TM_PRED_DF.csv", index=False)
+    return SA_PREDICTIONS_DF, TM_PREDICTIONS_DF
 
 # Retrieving results
 def retrieve_raw_data(CURRENT_TIME):
