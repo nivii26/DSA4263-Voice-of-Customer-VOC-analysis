@@ -12,7 +12,6 @@ root/data/*/*.csv
 root/src/*/*.csv
 
 # Models
-root/models/*
 
 # NLP
 pos_wv
