@@ -44,7 +44,7 @@ def TM_PREPROCESS_TEST(test_data, min_len=2, max_len=15):
 if __name__ == "__main__":
 
 	os.chdir(r"./root/src/preprocessing")
-	current_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+	CURRENT_TIME = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
 	master_data = pd.DataFrame(columns=["Sentiment", "Time", "Text"])
 
 	# Load Data
@@ -65,7 +65,7 @@ if __name__ == "__main__":
 	tfidf_model: A term frequency-inverse document frequency (TF-IDF) model that assigns weights to 
 	words based on their frequency in the corpus and their relevance to the document.
 	"""
-	master_data.to_csv("../data/tm/{CURRENT_TIME}_CLEANED_DF.csv", index = False)
+	master_data.to_csv(f"../data/tm/{CURRENT_TIME}_CLEANED_DF.csv", index = False)
 	TM_tfidf.save('../../models/tm/tm_tfidf')
 	TM_BOW_dict.save('../../models/tm/tm_bow_dict.dict') # can be loaded back using corpora.dictionary.load(fname)
 	corpora.MmCorpus.serialize('../../models/tm/tm_bow_corpus.mm', TM_BOW_corpus) # can be loaded back using corpora.MmCorpus(fname)
