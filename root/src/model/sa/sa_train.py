@@ -98,7 +98,7 @@ def train_XGB(train_data):
     print(f'Best training score: {best_model.best_score_}')
 
     # save model
-    best_model.best_estimator_.save_model("models/sa/xgb_model_final.json")
+    best_model.best_estimator_.save_model("models/sa/xgb_model.json")
     print("XGB Model has been trained")
     print(best_model.best_estimator_)
 
