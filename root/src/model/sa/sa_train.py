@@ -1,161 +1,124 @@
-{
- "cells": [
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "72b0778f",
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "# Basic requirements\n",
-    "import pandas as pd\n",
-    "import numpy as np\n",
-    "\n",
-    "# For XGBoost\n",
-    "from xgboost import XGBClassifier\n",
-    "from scipy.stats import uniform\n",
-    "from sklearn.model_selection import RandomizedSearchCV\n",
-    "\n",
-    "# For flair\n",
-    "from flair.nn import Classifier\n",
-    "from flair.data import Sentence\n",
-    "\n",
-    "def train_xgb(features_train_XGB,features_test_XGB):\n",
-    "    \n",
-    "    \"\"\"Build a XGBoost Model\n",
-    "    input: pre-processed dataframe for xgb\n",
-    "    output: save the model and display the results evaluation \n",
-    "    \n",
-    "    \"\"\"\n",
-    "    model = XGBClassifier(\n",
-    "    random_state=42, \n",
-    "    eval_metric=[\"error\", \"auc\"]\n",
-    "    )\n",
-    "   # Apply the best parameters found in grid search\n",
-    "    param_grid = {\n",
-    "        \"learning_rate\": [0.1, 0.01],\n",
-    "        \"colsample_bytree\": [0.6, 0.8, 1.0],\n",
-    "        \"subsample\": [0.6, 0.8, 1.0],\n",
-    "        \"max_depth\": [2, 3, 4],\n",
-    "        \"n_estimators\": [100, 200, 300, 400],\n",
-    "        \"reg_lambda\": [1, 1.5, 2],\n",
-    "        \"gamma\": [0, 0.1, 0.3],\n",
-    "    }\n",
-    "    \n",
-    "    rs = RandomizedSearchCV(XGBClassifier(), param_distributions=param_grid, n_iter=3)\n",
-    "    rs.fit(features_train_XGB.iloc[: , :-1], features_train_XGB['Sentiment'])\n",
-    "    \n",
-    "    xgb_probs = rs.predict_proba(features_test_XGB.iloc[: , :-1])\n",
-    "    xgb_sentiment = rs.predict(features_test_XGB.iloc[: , :-1])\n",
-    "    xgb_probs_df = pd.DataFrame(data = xgb_probs, columns = ['NEGATIVE', 'POSITIVE'])\n",
-    "    \n",
-    "    XGB_results_df = pd.DataFrame()\n",
-    "    XGB_results_df['xgb_sentiment'] = np.array(xgb_sentiment)\n",
-    "    XGB_results_df['xgb_prob'] = xgb_probs_df['POSITIVE']\n",
-    "    \n",
-    "    print(\"F1 score: \", f1_score(features_test_XGB['Sentiment'], XGB_results_df['xgb_sentiment']))\n",
-    "    print(\"PR_AUC score: \", average_precision_score(features_test_XGB['Sentiment'],XGB_results_df['xgb_prob']))\n",
-    "    print(\"ROC_AUC score: \", roc_auc_score(features_test_XGB['Sentiment'], XGB_results_df['xgb_prob']))\n",
-    "    print(\"Accuracy: \", accuracy_score(features_test_XGB['Sentiment'], XGB_results_df['xgb_sentiment']))\n",
-    "    \n",
-    "    # save in JSON format\n",
-    "    rs.save_model(\"xgb_model.json\")\n",
-    "    # save in text format\n",
-    "    rs.save_model(\"xgb_model.txt\")\n",
-    "    \n",
-    "    return XGB_results_df\n",
-    "\n",
-    "\n",
-    "def sa_model_predict(SA_PROCESSED_DF_XGB, SA_PROCESSED_DF_FLAIR):\n",
-    "    '''\n",
-    "    inputs : DataFrames with processed data for XGBoost and Flair respectively\n",
-    "    output : DataFrame with final class predictions and probability of predictions\n",
-    "    '''\n",
-    "\n",
-    "    ### Model 1: Flair\n",
-    "\n",
-    "    # Load Flair model\n",
-    "    tagger = Classifier.load('sentiment')\n",
-    "\n",
-    "    flair_prob = []\n",
-    "    flair_sentiments = []\n",
-    "\n",
-    "    for review in SA_PROCESSED_DF_FLAIR['Text'].to_list():\n",
-    "    \n",
-    "        # Convert format of review to Sentence\n",
-    "        sentence = Sentence(review)\n",
-    "        \n",
-    "        # Make prediction using flair\n",
-    "        tagger.predict(sentence)\n",
-    "        \n",
-    "        # extract sentiment prediction\n",
-    "        flair_prob.append(sentence.labels[0].score)  # numerical score 0-1 (probability of class)\n",
-    "        flair_sentiments.append(sentence.labels[0].value)  # 'POSITIVE' or 'NEGATIVE' sentiment\n",
-    "\n",
-    "    # Store the probability to predict positive class for each review\n",
-    "    flair_pos_probs = [0] *  len(flair_prob)\n",
-    "\n",
-    "    for i in range(0,len(flair_prob)):\n",
-    "        if flair_sentiments[i] == \"NEGATIVE\":\n",
-    "            flair_pos_probs[i] = 1 - flair_prob[i]\n",
-    "        \n",
-    "        elif flair_sentiments[i] == \"POSITIVE\":\n",
-    "            flair_pos_probs[i] = flair_prob[i]\n",
-    "\n",
-    "    label_map_2 = {\n",
-    "    'POSITIVE': 1,\n",
-    "    'NEGATIVE': 0,\n",
-    "    }\n",
-    "    \n",
-    "    # Create a new dataframe to store all results\n",
-    "    results = pd.DataFrame()\n",
-    "    results['flair_sentiment'] = np.array(flair_sentiments)\n",
-    "    results['flair_sentiment'] = results['flair_sentiment'].map(label_map_2)\n",
-    "    results['flair_prob'] = np.array(flair_pos_probs)\n",
-    "    \n",
-    "    ### Model 2: XGBoost\n",
-    "\n",
-    "    # Load the trained XGBoost model\n",
-    "    model_xgb = XGBClassifier()\n",
-    "    model_xgb.load_model(\"xgb_model.json\")\n",
-    "\n",
-    "    # Predict probabilities and sentiment\n",
-    "    xgb_probs = model_xgb.predict_proba(SA_PROCESSED_DF_XGB)\n",
-    "    xgb_sentiment = model_xgb.predict(SA_PROCESSED_DF_XGB)\n",
-    "\n",
-    "    xgb_probs_df = pd.DataFrame(data = xgb_probs, columns = ['NEGATIVE', 'POSITIVE'])\n",
-    "\n",
-    "    # Store XGB predictions into results dataframe\n",
-    "    results['xgb_sentiment'] = np.array(xgb_sentiment)\n",
-    "    results['xgb_prob'] = xgb_probs_df['POSITIVE']\n",
-    "\n",
-    "    ## Final: Ensemble of Flair and XGBoost predictions\n",
-    "    results['avg_prob'] = (results['flair_prob'] + results['xgb_prob']) / 2\n",
-    "    results['final_sentiment'] = np.where(results['avg_prob'] > 0.5, 1, 0)\n",
-    "    \n",
-    "    return results # [\"final_sentiment\"]"
-   ]
-  }
- ],
- "metadata": {
-  "kernelspec": {
-   "display_name": "Python 3 (ipykernel)",
-   "language": "python",
-   "name": "python3"
-  },
-  "language_info": {
-   "codemirror_mode": {
-    "name": "ipython",
-    "version": 3
-   },
-   "file_extension": ".py",
-   "mimetype": "text/x-python",
-   "name": "python",
-   "nbconvert_exporter": "python",
-   "pygments_lexer": "ipython3",
-   "version": "3.9.7"
-  }
- },
- "nbformat": 4,
- "nbformat_minor": 5
-}
+# Basic requirements
+import pandas as pd
+import numpy as np
+
+# Train - test split
+from sklearn.model_selection import train_test_split
+
+# For XGBoost
+from xgboost import XGBClassifier
+from scipy.stats import uniform
+from sklearn.model_selection import RandomizedSearchCV
+
+# For flair
+from flair.nn import Classifier
+from flair.data import Sentence
+
+# For metrics
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import ConfusionMatrixDisplay
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import f1_score
+from sklearn.metrics import roc_auc_score
+from sklearn.metrics import average_precision_score
+from sklearn.metrics import make_scorer
+from sklearn.model_selection import StratifiedKFold
+
+def sa_train_test_split(reviews_csv): 
+    '''
+    input : rawdata processed reviews_csv
+    output : 2 DataFrames - train_data, test_data
+    '''
+    positive_reviews = reviews_csv[reviews_csv.Sentiment == 'positive']
+    negative_reviews = reviews_csv[reviews_csv.Sentiment == 'negative']
+
+    # split data by 3:7
+    positive_train, positive_test = train_test_split(positive_reviews, test_size=0.3, random_state=101)
+    negative_train, negative_test = train_test_split(negative_reviews, test_size=0.3, random_state=101)
+
+    print("No. of positive training examples: ", positive_train.shape)
+    print("No. of positive testing examples: ", positive_test.shape)
+    print("No. of negative training data: ", negative_train.shape)
+    print("No. of negative testing examples: ", negative_test.shape)
+
+    train_data = pd.concat([positive_train, negative_train])
+    test_data = pd.concat([positive_test, negative_test])
+
+    print("Total no. of training examples: ", train_data.shape)
+    print("Total no. of testing examples: ", test_data.shape)
+
+    return train_data, test_data
+
+# def bayes_classifier(train, test):
+
+def train_XGB(train_data):
+    # create a default XGBoost classifier
+
+    model = XGBClassifier(
+        random_state=42, 
+        eval_metric=["error", "auc"]
+    )
+    # Create the grid search parameter grid and scoring funcitons
+    param_grid = {
+        "learning_rate": [0.1],
+        "colsample_bytree": [0.8],
+        "subsample": [0.6],
+        "max_depth": [3],
+        "n_estimators": [400],
+        "reg_lambda": [1],
+        "gamma": [0.1],
+    }
+    scoring = {
+        'AUC': 'roc_auc', 
+        'Accuracy': make_scorer(accuracy_score)
+    }
+    # create the Kfold object
+    num_folds = 3
+    kfold = StratifiedKFold(n_splits=num_folds)
+    # create the grid search object
+    n_iter=50
+    grid = RandomizedSearchCV(
+        estimator=model, 
+        param_distributions=param_grid,
+        cv=kfold,
+        scoring=scoring,
+        n_jobs=-1,
+        n_iter=n_iter,
+        refit="AUC",
+    )
+
+    label_map = {
+        'positive': 1,
+        'negative': 0,
+    }
+
+    # fit grid search
+    best_model = grid.fit(train_data.iloc[: , :-1], train_data['Sentiment'].map(label_map))
+
+    print(f'Best training score: {best_model.best_score_}')
+
+    # save model
+    best_model.best_estimator_.save_model("models/sa/xgb_model_final.json")
+    print("XGB Model has been trained")
+    print(best_model.best_estimator_)
+
+
+def evaluate_model_test(true_sent, predicted_sent, predicted_prob):
+    '''
+    input : List of true sentiment label, predicted sentiment label, predicted_probability
+    output : Print scores and confusion matrix
+    '''
+
+    # Print Scores
+    print("F1 score: ", f1_score(true_sent, predicted_sent ))
+    print("PR_AUC score: ", average_precision_score(true_sent, predicted_prob))
+    print("ROC_AUC score: ", roc_auc_score(true_sent, predicted_prob))
+    print("Accuracy: ", accuracy_score(true_sent, predicted_sent))    
+    
+    # Print Confusion Matrix
+    labels = ['Negative (0)', 'Positive (1)']
+    cm = confusion_matrix(true_sent, predicted_sent)
+    disp = ConfusionMatrixDisplay(confusion_matrix = cm, display_labels = labels)
+    disp.plot(cmap = 'YlGnBu'); 
+
+
