@@ -1,0 +1,17 @@
+model_name: lda
+bow_corpus_file: tm_bow_corpus.mm
+tfidf_corpus_file: tm_tfidf_corpus.mm
+id2word_file: tm_bow_dict.dict
+num_topics: 5
+tfidf_model_file: tm_tfidf
+model_file: tm_model
+preprocess_type: tfidf
+topic_map:
+  '0': topic0
+  '1': topic1
+  '2': topic2
+  '3': topic3
+  '4': topic4
+
+
+
