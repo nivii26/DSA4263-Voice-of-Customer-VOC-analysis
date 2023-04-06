@@ -53,10 +53,10 @@ def PREPROCESS_XGB(test_data):
 	Output: features_df(dataframe)
 	"""
 	# load model for test data
-	word2vec_model = Word2Vec.load('../../models/w2v_model')
-	tfidf = joblib.load('../../models/tfidf_sa.pkl')
-	pca_emb = joblib.load('../../models/pca_emb.pkl')
-	pca_tfidf = joblib.load('../../models/pca_tfidf.pkl')
+	word2vec_model = Word2Vec.load('../../models/sa/w2v_model')
+	tfidf = joblib.load('../../models/sa/tfidf_sa.pkl')
+	pca_emb = joblib.load('../../models/sa/pca_emb.pkl')
+	pca_tfidf = joblib.load('../../models/sa/pca_tfidf.pkl')
 
 	# apply the preprocessing function to the text data
 	test_data['Text'] = test_data['Text'].apply(sa_preprocess)
@@ -90,11 +90,12 @@ def PREPROCESS_XGB(test_data):
 
 	# add the TF-IDF features to the feature matrix DataFrame
 	features_df = pd.concat([pca_df_tfidf, pca_df_emb], axis=1)
+	
+	if 'Sentiment' in test_data.columns:
+		# add the label column to the feature matrix DataFrame
+		features_df['Sentiment'] = test_data['Sentiment']
+		features_df['Sentiment'] = test_data['Sentiment'].apply(lambda x: 1 if x == 'positive' else 0)
 
-	# add the label column to the feature matrix DataFrame
-	features_df['Sentiment'] = test_data['Sentiment']
-
-	features_df['Sentiment'] = features_df['Sentiment'].apply(lambda x: 1 if x == 'positive' else 0)
 	return features_df
 
 def PREPROCESS_FLAIR(raw_data):
@@ -102,14 +103,19 @@ def PREPROCESS_FLAIR(raw_data):
 	Input: raw_data(dataframe)
 	Output: final_cleaned_data_flair(dataframe)
 	"""
-	final_cleaned_data_flair = pd.DataFrame(columns=["Sentiment", "Time", "Text"])
-		## Clean the data
+	if 'Sentiment' in raw_data.columns:
+		final_cleaned_data_flair = pd.DataFrame(columns=["Sentiment", "Time", "Text"])
+	else:
+		final_cleaned_data_flair = pd.DataFrame(columns=["Time", "Text"])
+
+	## Clean the data
 	cleaned_data_flair = raw_data.dropna().drop_duplicates()
 	## Preprocess the Review Column
 	cleaned_data_flair["Text"] = cleaned_data_flair["Text"].apply(remove_html)
 	## Combine all the cleaned datasets
 	final_cleaned_data_flair = pd.concat([final_cleaned_data_flair, cleaned_data_flair])
-	final_cleaned_data_flair['Sentiment'] = final_cleaned_data_flair['Sentiment'].apply(lambda x: 1 if x == 'positive' else 0)
+	if 'Sentiment' in raw_data.columns:
+		final_cleaned_data_flair['Sentiment'] = final_cleaned_data_flair['Sentiment'].apply(lambda x: 1 if x == 'positive' else 0)
 	return final_cleaned_data_flair
 
 
