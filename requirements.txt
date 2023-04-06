@@ -1,6 +1,8 @@
 # Basic requirements
 pandas
 numpy
+joblib
+os
 
 # API requirements
 requests
@@ -13,8 +15,9 @@ zipfile
 # NLP packages
 nltk
 gensim
-contractions
+contractions 
 demoji
+nlpaug
 
 # Visualization Tools
 pandas-profiling
