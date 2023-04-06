@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import nltk
+import random
 import nlpaug.augmenter.word as naw
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
@@ -36,6 +37,7 @@ def augment_train(train_data):
 	positive_texts = train_data[train_data['Sentiment'] == 'positive']['Text'].tolist()
 	negative_texts = train_data[train_data['Sentiment'] == 'negative']['Text'].tolist()
 	# Over-sample negative training examples using nlp-aug
+	random.seed(42)
 	aug = naw.SynonymAug()
 	augmented_texts = aug.augment(negative_texts, n=len(negative_texts))
 	negative_labels = ['negative'] * len(negative_texts)
@@ -182,7 +184,7 @@ if __name__ == "__main__":
 
 	os.chdir("./root/src/preprocessing")
 	current_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
-	master_data = pd.DataFrame(columns=["Sentiment", "Time", "Text"])
+	master_data = pd.DataFrame(columns=["Time", "Text"])
 
 	# Load Data
 	for file in os.listdir(r"../../data/processed"):
