@@ -46,6 +46,7 @@ def augment_train(train_data):
 	train_data = pd.concat([train_data, augmented_df], ignore_index=True)
 	return train_data
 
+
 def PREPROCESS_XGB(test_data):
 	"""
 	Input: test_data(dataframe)-cleaned data
@@ -89,6 +90,11 @@ def PREPROCESS_XGB(test_data):
 
 	# add the TF-IDF features to the feature matrix DataFrame
 	features_df = pd.concat([pca_df_tfidf, pca_df_emb], axis=1)
+
+	# add the label column to the feature matrix DataFrame
+	features_df['Sentiment'] = test_data['Sentiment']
+
+	features_df['Sentiment'] = features_df['Sentiment'].apply(lambda x: 1 if x == 'positive' else 0)
 	return features_df
 
 def PREPROCESS_FLAIR(raw_data):
@@ -103,6 +109,7 @@ def PREPROCESS_FLAIR(raw_data):
 	cleaned_data_flair["Text"] = cleaned_data_flair["Text"].apply(remove_html)
 	## Combine all the cleaned datasets
 	final_cleaned_data_flair = pd.concat([final_cleaned_data_flair, cleaned_data_flair])
+	final_cleaned_data_flair['Sentiment'] = final_cleaned_data_flair['Sentiment'].apply(lambda x: 1 if x == 'positive' else 0)
 	return final_cleaned_data_flair
 
 
@@ -161,13 +168,14 @@ def SA_PREPROCESS_TRAIN(train_data):
 	# add the label column to the feature matrix DataFrame
 	label = features_df.columns
 	features_df['Sentiment'] = train_data['Sentiment']
+	features_df['Sentiment'] = features_df['Sentiment'].apply(lambda x: 1 if x == 'positive' else 0)
 	
 	# Saving the model and data
 	word2vec_model.save('../../models/sa/w2v_model')
 	joblib.dump(tfidf, '../../models/sa/tfidf_sa.pkl')
 	joblib.dump(pca_emb, '../../models/sa/pca_emb.pkl')
 	joblib.dump(pca_tfidf, '../../models/sa/pca_tfidf.pkl')
-	# features_df.to_csv("../data/sa/features_train_sa.csv", index=False)
+	#features_df.to_csv("../data/sa/features_train_sa.csv", index=False)
 	return features_df
 
 def SA_PREPROCESS_TEST(raw_data):
@@ -184,7 +192,7 @@ if __name__ == "__main__":
 
 	os.chdir("./root/src/preprocessing")
 	current_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
-	master_data = pd.DataFrame(columns=["Time", "Text"])
+	master_data = pd.DataFrame(columns=["Sentiment", "Time", "Text"])
 
 	# Load Data
 	for file in os.listdir(r"../../data/processed"):
