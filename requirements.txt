@@ -21,3 +21,7 @@ pandas-profiling
 
 # Unit-Testing
 pytest
+
+# Config
+pyyaml
+typing
