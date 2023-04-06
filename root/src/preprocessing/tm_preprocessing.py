@@ -15,7 +15,18 @@ from gensim import corpora, models
 from gensim.utils import simple_preprocess
 from gensim.parsing.preprocessing import STOPWORDS
 
-def tm_preprocess_text(reviewText, min_len=2, max_len=15):
+def tm_preprocess_text(reviewText: str, min_len:int = 2, max_len:int =20):
+	"""
+	Tokenize, remove stopwords and lemmatize text
+
+	Input: 
+	1. reviewText: A string of sentence
+	2. min_len (optional, default=2): Minimum number of characters in word we keep
+	3. max_len (optional, default=20): Max number of characters in word we keep
+
+	Output:
+	lemmaText: A list of the remaining tokenized words
+	"""
 	# Tokenize and Remove stopwords
 	tokenizeText = [token for token in simple_preprocess(reviewText, False, min_len, max_len) if token not in STOPWORDS]
 	# Lemmatization
@@ -23,7 +34,21 @@ def tm_preprocess_text(reviewText, min_len=2, max_len=15):
 	lemmaText = [Lemmatizer.lemmatize(word) for word in tokenizeText]
 	return lemmaText
 
-def TM_PREPROCESS_TRAIN(train_data, min_len=2, max_len=15):
+def TM_PREPROCESS_TRAIN(train_data: pd.DataFrame, min_len:int = 2, max_len:int=20):
+	"""
+	Preprocess Text Column of reviews and create both a corpus and dictionary for each BOW and Tfidf 
+
+	Input: 
+	train_data: Cleaned Dataframe of reviews data 
+	min_len (optional, default=2): Minimum number of characters in word we keep
+	max_len (optional, default=20): Max number of characters in word we keep
+
+	Output:
+	TM_BOW_dict:
+	TM_BOW_corpus:
+	TM_tfidf:
+	TM_tfidf_corpus:
+	"""
 	train_data["Text"] = train_data["Text"].apply(lambda x: tm_preprocess_text(x, min_len, max_len))
 	
 	# BOW
@@ -37,7 +62,14 @@ def TM_PREPROCESS_TRAIN(train_data, min_len=2, max_len=15):
 	
 	return [TM_BOW_dict, TM_BOW_corpus, TM_tfidf, TM_tfidf_corpus]
 
-def TM_PREPROCESS_TEST(test_data, min_len=2, max_len=15):
+def TM_PREPROCESS_TEST(test_data, min_len=2, max_len=20):
+	"""
+	Preprocess text column for test_data 
+
+	Input: test_data
+	
+	Output: test_data with a new_column of processed_text
+	"""
 	test_data["processed_text"] = test_data["Text"].apply(lambda x: tm_preprocess_text(x, min_len, max_len))
 	return test_data
 
