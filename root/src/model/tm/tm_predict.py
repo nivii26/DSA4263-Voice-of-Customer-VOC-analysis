@@ -4,7 +4,7 @@ from typing import List
 import pandas as pd
 from gensim.models import LdaModel, Nmf, LsiModel, TfidfModel
 from gensim import corpora
-from .core import MODEL_DIR, CONFIG
+from .core import MODEL_DIR, CONFIG, ROOT_DIR
 
 
 def load_model():
@@ -25,12 +25,12 @@ def load_model():
     return model
 
 
-def preprocess(list_of_text: List) -> List:
+def preprocess(list_of_text: List[str]) -> List[tuple]:
     """Conducts bow preprocessing on a list of text
     Parameters:
         list_of_text: Each embedded list is a document
     Returns:
-        (gensim corpus object)
+        corpus (gensim corpus object): Preprocessed document
     """
     bow_dict = corpora.Dictionary.load(str(MODEL_DIR / CONFIG["id2word_file"]))
     corpus = [bow_dict.doc2bow(text) for text in list_of_text]
@@ -40,7 +40,7 @@ def preprocess(list_of_text: List) -> List:
     return corpus
 
 
-def predict(bow_document: List, model) -> tuple:
+def predict(bow_document: List[tuple], model) -> tuple:
     """Get topic model predictions
     Parameters:
         bow_document (list): A document in the form of [(word id, importance), (word id, importance) ...]
@@ -56,7 +56,7 @@ def predict(bow_document: List, model) -> tuple:
     return mapped_pred
 
 
-def batch_predict(corpus: List, model) -> List:
+def batch_predict(corpus: List[tuple], model) -> List[tuple]:
     """Make batch prediction
     Parameters:
         corpus (list): Each embedded list within is in the form [(word id, importance), (word id, importance) ...]
@@ -85,12 +85,12 @@ def TM_MODEL_PREDICT(tm_df: pd.DataFrame) -> pd.DataFrame:
     return tm_df.drop("processed_text", axis=1)
 
 
-# if __name__ == "__main__":
-#     from ast import literal_eval
-#     df = pd.read_csv(
-#         str(ROOT_DIR / "src" / "data" / "tm" / "20230405230550_CLEANED_DF.csv"),
-#         nrows=30,
-#     )
-#     # print(df)
-#     df["processed_text"] = df["Text"].apply(lambda x: literal_eval(x))
-#     print(TM_MODEL_PREDICT(df))
+if __name__ == "__main__":
+    from ast import literal_eval
+    df = pd.read_csv(
+        str(ROOT_DIR / "src" / "data" / "tm" / "20230405230550_CLEANED_DF.csv"),
+        nrows=30,
+    )
+    # print(df)
+    df["processed_text"] = df["Text"].apply(lambda x: literal_eval(x))
+    print(TM_MODEL_PREDICT(df))
