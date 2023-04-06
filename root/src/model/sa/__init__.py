@@ -1,2 +1,2 @@
-from SA_TRAIN import *
-from SA_PREDICT import *
+from .sa_predict import *
+from .sa_train import *
