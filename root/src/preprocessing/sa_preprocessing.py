@@ -199,14 +199,13 @@ def SA_PREPROCESS_TEST(raw_data):
 
 if __name__ == "__main__":
 
-	os.chdir("./root/src/preprocessing")
 	current_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
 	master_data = pd.DataFrame(columns=["Sentiment", "Time", "Text"])
 
 	# Load Data
-	for file in os.listdir(r"../../data/processed"):
+	for file in os.listdir(r"data/processed"):
 		if file.endswith(".csv"):
-			new_data = pd.read_csv(rf"../../data/processed/{file}")
+			new_data = pd.read_csv(rf"data/processed/{file}")
 			master_data = pd.concat([master_data, new_data])
 	
 	# process data and feature engineering for training data
@@ -214,5 +213,5 @@ if __name__ == "__main__":
 
 	# process data and feature engineering for test data
 	#SA_PROCESSED_DF_XGB, SA_PROCESSED_DF_FLAIR=SA_PREPROCESS_TEST(raw_data)
-	#SA_PROCESSED_DF_XGB.to_csv("../data/sa/features_train_sa_new.csv", index=False)
-	#SA_PROCESSED_DF_FLAIR.to_csv("../data/sa/features_test_sa_new.csv", index=False)
+	#SA_PROCESSED_DF_XGB.to_csv("src/data/sa/features_train_sa_new.csv", index=False)
+	#SA_PROCESSED_DF_FLAIR.to_csv("src/data/sa/features_test_sa_new.csv", index=False)
