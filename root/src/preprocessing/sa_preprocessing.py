@@ -10,7 +10,6 @@ from gensim.models import Word2Vec
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
-from imblearn.over_sampling import RandomOverSampler
 import datetime
 import joblib
 
