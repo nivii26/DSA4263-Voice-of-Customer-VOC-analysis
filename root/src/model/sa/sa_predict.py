@@ -78,7 +78,7 @@ def flair_predict(flair_data):
     flair_results = pd.DataFrame()
     flair_results['flair_sentiment'] = np.array(flair_sentiments)
     # flair_results['flair_sentiment_class'] = flair_results['flair_sentiment'].map(label_map_1)
-    flair_results['flair_sentiment'] = results['flair_sentiment'].map(label_map_1)
+    flair_results['flair_sentiment'] = flair_results['flair_sentiment'].map(label_map_1)
     flair_results['flair_prob'] = np.array(flair_pos_probs)
     
     return flair_results
