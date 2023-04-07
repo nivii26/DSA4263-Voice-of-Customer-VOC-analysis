@@ -18,15 +18,15 @@ Available endpoints are as listed below.
 Not implemented yet
 """
 
-# uvicorn main:app --port 5000, API Documentation: 127.0.0.1:5000/docs
+# uvicorn --app-dir=./root/src main:app --reload --port 5000, API Documentation: 127.0.0.1:5000/docs
 app = fastapi.FastAPI(
     title = "Semantic Analysis and Topic Modelling",
     description = description,
     version = "0.0.1"
 )
 
-app.mount("/assets", StaticFiles(directory="assets"), name="assets")
-templates = Jinja2Templates(directory="assets")
+app.mount("/assets", StaticFiles(directory="./root/src/assets"), name="assets")
+templates = Jinja2Templates(directory='./root/src/assets')
 
 @app.get("/", response_class=HTMLResponse)
 async def root(request: fastapi.Request):
