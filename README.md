@@ -1,4 +1,4 @@
-# DSA4263-Voice-of-Customer-VOC-analysis
+# DSA4263: Voice of the Customer (VoC) Analysis
 # TODO: Fill in markdown
 
 # Introduction
