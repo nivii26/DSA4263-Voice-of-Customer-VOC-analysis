@@ -10,17 +10,15 @@ import numpy as np
 from gensim.models import Word2Vec
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import PCA
-from sklearn.preprocessing import StandardScaler
-from imblearn.over_sampling import RandomOverSampler
 import datetime
 import joblib
 
 from .rawdata_preprocessing import PREPROCESS_RAW, remove_html
 
 # download necessary NLTK data (only need to run this once)
-nltk.download('punkt')
-nltk.download('wordnet')
-nltk.download('stopwords')
+#nltk.download('punkt')
+#nltk.download('wordnet')
+#nltk.download('stopwords')
 
 def sa_preprocess(text):
 	# tokenize the text into words
@@ -56,10 +54,10 @@ def PREPROCESS_XGB(test_data):
 	Output: features_df(dataframe)
 	"""
 	# load model for test data
-	word2vec_model = Word2Vec.load('models/sa/w2v_model')
-	tfidf = joblib.load('models/sa/tfidf_sa.pkl')
-	pca_emb = joblib.load('models/sa/pca_emb.pkl')
-	pca_tfidf = joblib.load('models/sa/pca_tfidf.pkl')
+	word2vec_model = Word2Vec.load('./root/models/sa/w2v_model')
+	tfidf = joblib.load('./root/models/sa/tfidf_sa.pkl')
+	pca_emb = joblib.load('./root/models/sa/pca_emb.pkl')
+	pca_tfidf = joblib.load('./root/models/sa/pca_tfidf.pkl')
 
 	# apply the preprocessing function to the text data
 	test_data['Text'] = test_data['Text'].apply(sa_preprocess)

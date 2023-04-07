@@ -17,6 +17,9 @@ demoji
 nlpaug
 
 # Modelling
+sklearn
+scipy
+imblearn
 xgboost
 flair
 

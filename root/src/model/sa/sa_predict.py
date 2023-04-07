@@ -13,7 +13,7 @@ from flair.data import Sentence
 def XGB_predict(XGB_data):
     # Load the trained XGBoost model
     model_xgb =  XGBClassifier()
-    model_xgb.load_model("models/sa/xgb_model.json")
+    model_xgb.load_model("./root/models/sa/xgb_model.json")
     
     # Predict probabilities and sentiment
     xgb_probs = model_xgb.predict_proba(XGB_data)
