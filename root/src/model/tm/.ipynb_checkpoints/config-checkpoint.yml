@@ -1,0 +1,16 @@
+model_name: lsa
+bow_corpus_file: tm_bow_corpus.mm
+tfidf_corpus_file: tm_tfidf_corpus.mm
+id2word_file: tm_bow_dict.dict
+num_topics: 7
+tfidf_model_file: tm_tfidf
+model_file: tm_model
+preprocess_type: tfidf
+topic_map:
+  '0': 'Coffee and tea flavor'
+  '1': 'Healthy and allergy-friendly snacks'
+  '2': 'Coffee and its complements'
+  '3': 'Locations and prices'
+  '4': 'Snack/Protein Bars'
+  '5': 'Flavoured cereal/nut/fruits bars and drink mix'
+  '6': 'Chocolate flavoured consumables and flavoured drinks'

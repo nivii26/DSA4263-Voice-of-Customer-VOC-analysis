@@ -51,7 +51,7 @@ def predict(bow_document: List[tuple], model) -> tuple:
     pred = model[bow_document]
     topic_map = CONFIG["topic_map"]
     mapped_pred = [
-        (topic_map[str(topic_num)], round(proba, 2)) for topic_num, proba in pred
+        (topic_map[str(topic_num)], round(proba, 3)) for topic_num, proba in pred
     ]
     return mapped_pred
 
@@ -88,7 +88,7 @@ def TM_MODEL_PREDICT(tm_df: pd.DataFrame) -> pd.DataFrame:
 if __name__ == "__main__":
     from ast import literal_eval
     df = pd.read_csv(
-        str(ROOT_DIR / "src" / "data" / "tm" / "20230405230550_CLEANED_DF.csv"),
+        str(ROOT_DIR / "src" / "data" / "tm" / "20230407134320_CLEANED_DF.csv"),
         nrows=30,
     )
     # print(df)
