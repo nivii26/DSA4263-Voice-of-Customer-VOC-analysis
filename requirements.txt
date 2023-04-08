@@ -2,15 +2,12 @@
 pandas
 numpy
 joblib
-os
 
 # API requirements
 requests
 fastapi
-json
 python-multipart
 uvicorn
-zipfile
 
 # NLP packages
 nltk
@@ -18,6 +15,13 @@ gensim
 contractions 
 demoji
 nlpaug
+
+# Modelling
+sklearn
+scipy
+imblearn
+xgboost
+flair
 
 # Visualization Tools
 pandas-profiling

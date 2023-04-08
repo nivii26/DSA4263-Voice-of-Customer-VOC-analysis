@@ -10,17 +10,15 @@ import numpy as np
 from gensim.models import Word2Vec
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import PCA
-from sklearn.preprocessing import StandardScaler
-from imblearn.over_sampling import RandomOverSampler
 import datetime
 import joblib
 
 from .rawdata_preprocessing import PREPROCESS_RAW, remove_html
 
 # download necessary NLTK data (only need to run this once)
-nltk.download('punkt')
-nltk.download('wordnet')
-nltk.download('stopwords')
+#nltk.download('punkt')
+#nltk.download('wordnet')
+#nltk.download('stopwords')
 
 def sa_preprocess(text):
 	# tokenize the text into words
@@ -48,16 +46,18 @@ def augment_train(train_data):
 	return train_data
 
 def PREPROCESS_XGB(test_data):
-	s = test_data['Sentiment']
+	
+	if 'Sentiment' in test_data.columns.to_list():
+		s = test_data['Sentiment']
 	"""
 	Input: test_data(dataframe)-cleaned data
 	Output: features_df(dataframe)
 	"""
 	# load model for test data
-	word2vec_model = Word2Vec.load('models/sa/w2v_model')
-	tfidf = joblib.load('models/sa/tfidf_sa.pkl')
-	pca_emb = joblib.load('models/sa/pca_emb.pkl')
-	pca_tfidf = joblib.load('models/sa/pca_tfidf.pkl')
+	word2vec_model = Word2Vec.load('./root/models/sa/w2v_model')
+	tfidf = joblib.load('./root/models/sa/tfidf_sa.pkl')
+	pca_emb = joblib.load('./root/models/sa/pca_emb.pkl')
+	pca_tfidf = joblib.load('./root/models/sa/pca_tfidf.pkl')
 
 	# apply the preprocessing function to the text data
 	test_data['Text'] = test_data['Text'].apply(sa_preprocess)
@@ -199,13 +199,14 @@ def SA_PREPROCESS_TEST(raw_data):
 
 if __name__ == "__main__":
 
+	os.chdir("./root/src/preprocessing")
 	current_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
 	master_data = pd.DataFrame(columns=["Sentiment", "Time", "Text"])
 
 	# Load Data
-	for file in os.listdir(r"data/processed"):
+	for file in os.listdir(r"../../data/processed"):
 		if file.endswith(".csv"):
-			new_data = pd.read_csv(rf"data/processed/{file}")
+			new_data = pd.read_csv(rf"../../data/processed/{file}")
 			master_data = pd.concat([master_data, new_data])
 	
 	# process data and feature engineering for training data
@@ -213,5 +214,5 @@ if __name__ == "__main__":
 
 	# process data and feature engineering for test data
 	#SA_PROCESSED_DF_XGB, SA_PROCESSED_DF_FLAIR=SA_PREPROCESS_TEST(raw_data)
-	#SA_PROCESSED_DF_XGB.to_csv("src/data/sa/features_train_sa_new.csv", index=False)
-	#SA_PROCESSED_DF_FLAIR.to_csv("src/data/sa/features_test_sa_new.csv", index=False)
+	#SA_PROCESSED_DF_XGB.to_csv("../data/sa/features_train_sa_new.csv", index=False)
+	#SA_PROCESSED_DF_FLAIR.to_csv("../data/sa/features_test_sa_new.csv", index=False)

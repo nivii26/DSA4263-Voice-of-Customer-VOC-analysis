@@ -3,8 +3,9 @@ import os
 import datetime
 import pandas as pd
 import fastapi
+import zipfile
 from utils import *
-from io import StringIO
+from io import BytesIO
 from fastapi.responses import HTMLResponse, FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -18,15 +19,15 @@ Available endpoints are as listed below.
 Not implemented yet
 """
 
-# uvicorn main:app --port 5000, API Documentation: 127.0.0.1:5000/docs
+# uvicorn --app-dir=./root/src main:app --reload --port 5000, API Documentation: 127.0.0.1:5000/docs
 app = fastapi.FastAPI(
     title = "Semantic Analysis and Topic Modelling",
     description = description,
     version = "0.0.1"
 )
 
-app.mount("/assets", StaticFiles(directory="assets"), name="assets")
-templates = Jinja2Templates(directory="assets")
+app.mount("/assets", StaticFiles(directory="./root/src/assets"), name="assets")
+templates = Jinja2Templates(directory='./root/src/assets')
 
 @app.get("/", response_class=HTMLResponse)
 async def root(request: fastapi.Request):
@@ -39,14 +40,16 @@ async def predict_upload_csv(file: fastapi.UploadFile = fastapi.File(...)):
 
     Input: CSV File with the columns=["Time", "Text"], Zip File containing multiple CSV files of the previous formats
     
-    Output: 3 downloadable CSV files 
+    Output: 2 downloadable CSV files 
     1 for Sentiment Analysis predictions
-    2 for Topic Modelling predictions (Positive and Negative Sentiments)
+    2 for Topic Modelling predictions
     """
     CURRENT_TIME = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
     expected_columns = set(["Time", "Text"])
-    if file.content_type == "application/zip":
-        master_df = zip_preprocess(file, expected_columns)
+    if file.content_type == "application/zip" or "application/x-zip-compressed":
+        content = file.file.read()
+        fileReadBuffer = BytesIO(content)
+        master_df = zip_preprocess(fileReadBuffer, expected_columns)
         if set(master_df.columns) != expected_columns:
             raise "Unexpected columns in DataFrame. Expected: {expected_columns}. Actual: {set(master_df.columns)}"
     elif file.content_type in ["text/csv", "application/csv"]:
@@ -55,16 +58,19 @@ async def predict_upload_csv(file: fastapi.UploadFile = fastapi.File(...)):
             raise "Unexpected columns in DataFrame. Expected: {expected_columns}. Actual: {set(master_df.columns)}"
     else:
         raise HTTPException(status_code=400, detail="Only Zip and CSV files are allowed")
-    sa_pred, tm_pos_pred, tm_neg_pred = generate_predictions(master_df, CURRENT_TIME)
-    sa_pred_file = StringIO(sa_pred)
-    tm_pos_pred_file = StringIO(tm_pos_pred)
-    tm_neg_pred_file = StringIO(tm_neg_pred)
-    return {
-        "sa_predictions.csv": sa_pred_file.get_value(),
-        "tm_pos_predictions.csv": tm_pos_pred_file.get_value(),
-        "tm_neg_predictions.csv": tm_neg_pred_file.get_value(),
-        "submission_id": CURRENT_TIME
-    }
+    sa_pred, tm_pred = generate_predictions(master_df, CURRENT_TIME)
+    sa_result_pred = sa_pred.loc[:,["Time", "Text", "Sentiment", "avg_prob"]]
+    tm_result_pred = tm_pred.loc[:,["Time", "Text", "Sentiment", "Predicted Topic"]]
+    dfs = [("SA_RESULT.csv", sa_result_pred), ("TM_RESULT.csv", tm_result_pred)]
+    inMemoryBuffer = BytesIO()
+    with zipfile.ZipFile(inMemoryBuffer, mode="w") as zip_file:
+        for file_name, df in dfs:
+            csv_bytes = df.to_csv(index=False).encode()
+            zip_file.writestr(file_name, csv_bytes)
+    response = Response(content=inMemoryBuffer.getvalue(),
+                        media_type="application/zip")
+    response.headers["Content-Disposition"] = f"attachment; filename={CURRENT_TIME}_predictions.zip"
+    return response
 
 @app.get("/api/raw_data")
 async def get_raw_data(CURRENT_TIME: int):

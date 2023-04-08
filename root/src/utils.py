@@ -2,9 +2,9 @@ import os
 import pandas as pd
 import zipfile
 
-from .preprocessing import TM_PREPROCESS_TEST, SA_PREPROCESS_TEST
-from .model.sa import SA_MODEL_PREDICT
-from .model.tm import TM_MODEL_PREDICT
+from preprocessing import TM_PREPROCESS_TEST, SA_PREPROCESS_TEST
+from model import SA_MODEL_PREDICT
+from model import TM_MODEL_PREDICT
 
 def zip_preprocess(zip_file, expected_columns):
     """
@@ -14,16 +14,16 @@ def zip_preprocess(zip_file, expected_columns):
 
     Output: 1 DataFrame with columns ["Date", "Text"] created using all relevant csv files in the zipfile
     """
-    masterdf = pd.DataFrame(columns=["Time", "Text"])
+    masterdf = pd.DataFrame(columns=expected_columns)
     with zipfile.ZipFile(zip_file, 'r') as zip_ref:
-        for file in zip_ref.infolist():
-            if file.filename.endswith("csv"):
+        for file in zip_ref.namelist():
+            if file.endswith("csv"):
                 with zip_ref.open(file) as f:
                     tmp_df = pd.read_csv(f)
                     if set(tmp_df.columns) != set(expected_columns):
                         continue
                     f.close()
-                    master_df = pd.concat([master_df, tmp_df])
+                    masterdf = pd.concat([masterdf, tmp_df])
     return masterdf
 
 def generate_predictions(RAW_DF, CURRENT_TIME, SAVE=True):
@@ -56,12 +56,12 @@ def generate_predictions(RAW_DF, CURRENT_TIME, SAVE=True):
     # TM Predictions
     TM_PREDICTIONS_DF = TM_MODEL_PREDICT(TM_DF)
     if SAVE:
-        RAW_DF.to_csv(fr"../data/raw/{CURRENT_TIME}_RAW_DF.csv", index=False)
-        SA_PROCESSED_DF_XGB.to_csv(fr"./data/sa/{CURRENT_TIME}_SA_PROCESSED_DF_XGB.csv", index=False)
-        SA_PROCESSED_DF_FLAIR.to_csv(fr"./data/sa/{CURRENT_TIME}_SA_PROCESSED_DF_FLAIR.csv", index=False)
-        SA_PREDICTIONS_DF.to_csv(fr"./data/sa/{CURRENT_TIME}_SA_PRED_DF.csv", index=False)
-        TM_DF.to_csv(fr"./data/tm/{CURRENT_TIME}_TM_DF.csv", index=False)
-        TM_PREDICTIONS_DF.to_csv(fr"./data/tm/{CURRENT_TIME}_TM_PRED_DF.csv", index=False)
+        RAW_DF.to_csv(fr"./root/data/raw/{CURRENT_TIME}_RAW_DF.csv", index=False)
+        SA_PROCESSED_DF_XGB.to_csv(fr"./root/src/data/sa/{CURRENT_TIME}_SA_PROCESSED_DF_XGB.csv", index=False)
+        SA_PROCESSED_DF_FLAIR.to_csv(fr"./root/src/data/sa/{CURRENT_TIME}_SA_PROCESSED_DF_FLAIR.csv", index=False)
+        SA_PREDICTIONS_DF.to_csv(fr"./root/src/data/sa/{CURRENT_TIME}_SA_PRED_DF.csv", index=False)
+        TM_DF.to_csv(fr"./root/src/data/tm/{CURRENT_TIME}_TM_DF.csv", index=False)
+        TM_PREDICTIONS_DF.to_csv(fr"./root/src/data/tm/{CURRENT_TIME}_TM_PRED_DF.csv", index=False)
     return SA_PREDICTIONS_DF, TM_PREDICTIONS_DF
 
 # Retrieving results
