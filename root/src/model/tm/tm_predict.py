@@ -25,12 +25,12 @@ def load_model():
     return model
 
 
-def preprocess(list_of_text: List[str]) -> List[tuple]:
+def preprocess(list_of_text: List[List[str]]) -> List[List[tuple]]:
     """Conducts bow preprocessing on a list of text
     Parameters:
-        list_of_text: Each embedded list is a document
+        list_of_text (list): Each embedded list is a document
     Returns:
-        corpus (gensim corpus object): Preprocessed document
+        corpus (list): Each embedded list contains tuples in the form (word id, embedded value)
     """
     bow_dict = corpora.Dictionary.load(str(MODEL_DIR / CONFIG["id2word_file"]))
     corpus = [bow_dict.doc2bow(text) for text in list_of_text]
@@ -40,13 +40,13 @@ def preprocess(list_of_text: List[str]) -> List[tuple]:
     return corpus
 
 
-def predict(bow_document: List[tuple], model) -> tuple:
+def predict(bow_document: List[tuple], model) -> List[tuple]:
     """Get topic model predictions
     Parameters:
         bow_document (list): A document in the form of [(word id, importance), (word id, importance) ...]
         model (gensim model object): Either lda, nmf, lsa
     Returns:
-        mapped_pred (tuple): (topic label, proba)
+        mapped_pred (list): Each embedded tuple is of the form (topic label, proba)
     """
     pred = model[bow_document]
     topic_map = CONFIG["topic_map"]
@@ -56,13 +56,13 @@ def predict(bow_document: List[tuple], model) -> tuple:
     return mapped_pred
 
 
-def batch_predict(corpus: List[tuple], model) -> List[tuple]:
+def batch_predict(corpus: List[List[tuple]], model) -> List[List[tuple]]:
     """Make batch prediction
     Parameters:
         corpus (list): Each embedded list within is in the form [(word id, importance), (word id, importance) ...]
         model (gensim model object): Either lda, nmf, lsa
     Returns:
-        (list): Each embedded tuple is of form (topic label, proba)
+        (list): Each embedded list contains tuples of form (topic label, proba)
     """
     return [predict(doc, model) for doc in corpus]
 
@@ -88,7 +88,7 @@ def TM_MODEL_PREDICT(tm_df: pd.DataFrame) -> pd.DataFrame:
 if __name__ == "__main__":
     from ast import literal_eval
     df = pd.read_csv(
-        str(ROOT_DIR / "src" / "data" / "tm" / "20230407134320_CLEANED_DF.csv"),
+        str(ROOT_DIR / "src" / "data" / "tm" / "20230410221742_CLEANED_DF.csv"),
         nrows=30,
     )
     # print(df)

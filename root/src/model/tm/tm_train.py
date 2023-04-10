@@ -57,7 +57,7 @@ def compute_coherence_score(
     model_name: str,
     corpus: corpora.MmCorpus,
     id2word: corpora.Dictionary,
-    lemma_text: List[str],
+    lemma_text: List[List[str]],
     num_topics: int,
     random_state=0,
     coherence_metric="c_v",
@@ -91,7 +91,7 @@ def evaluate_topic_models(
     model_name: List[str],
     corpuses: dict,
     id2word: corpora.Dictionary,
-    lemma_text: List[str],
+    lemma_text: List[List[str]],
     num_topics: List[int],
 ) -> pd.DataFrame:
     """Run different gensim algorithms with different corpus inputs
