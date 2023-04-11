@@ -128,7 +128,7 @@ def test_final(df_xgb, df_flair):
 
 
 if __name__ == "__main__":
-    os.chdir(r"./root/unit_testing")
+    # os.chdir(r"./root/unit_testing")
     df_xgb, df_flair = sample_documents()
     test_svm(df_xgb)
     test_xgb(df_xgb)
