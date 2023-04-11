@@ -10,15 +10,17 @@ import numpy as np
 from gensim.models import Word2Vec
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
+from imblearn.over_sampling import RandomOverSampler
 import datetime
 import joblib
 
 from .rawdata_preprocessing import PREPROCESS_RAW, remove_html
 
 # download necessary NLTK data (only need to run this once)
-#nltk.download('punkt')
-#nltk.download('wordnet')
-#nltk.download('stopwords')
+nltk.download('punkt')
+nltk.download('wordnet')
+nltk.download('stopwords')
 
 def sa_preprocess(text):
 	# tokenize the text into words
@@ -46,7 +48,7 @@ def augment_train(train_data):
 	return train_data
 
 def PREPROCESS_XGB(test_data):
-	
+
 	if 'Sentiment' in test_data.columns.to_list():
 		s = test_data['Sentiment']
 	"""
@@ -54,10 +56,10 @@ def PREPROCESS_XGB(test_data):
 	Output: features_df(dataframe)
 	"""
 	# load model for test data
-	word2vec_model = Word2Vec.load('./root/models/sa/w2v_model')
-	tfidf = joblib.load('./root/models/sa/tfidf_sa.pkl')
-	pca_emb = joblib.load('./root/models/sa/pca_emb.pkl')
-	pca_tfidf = joblib.load('./root/models/sa/pca_tfidf.pkl')
+	word2vec_model = Word2Vec.load('root/models/sa/w2v_model')
+	tfidf = joblib.load('root/models/sa/tfidf_sa.pkl')
+	pca_emb = joblib.load('root/models/sa/pca_emb.pkl')
+	pca_tfidf = joblib.load('root/models/sa/pca_tfidf.pkl')
 
 	# apply the preprocessing function to the text data
 	test_data['Text'] = test_data['Text'].apply(sa_preprocess)
@@ -173,17 +175,16 @@ def SA_PREPROCESS_TRAIN(train_data):
 	# add the TF-IDF features to the feature matrix DataFrame
 	features_df = pd.concat([pca_df_tfidf, pca_df_emb], axis=1)
 
-
 	# add the label column to the feature matrix DataFrame
 	label = features_df.columns
 	features_df['Sentiment'] = train_data['Sentiment']
 	features_df['Sentiment'] = features_df['Sentiment'].apply(lambda x: 1 if x == 'positive' else 0)
 	
 	# Saving the model and data
-	word2vec_model.save('models/sa/w2v_model')
-	joblib.dump(tfidf, 'models/sa/tfidf_sa.pkl')
-	joblib.dump(pca_emb, 'models/sa/pca_emb.pkl')
-	joblib.dump(pca_tfidf, 'models/sa/pca_tfidf.pkl')
+	word2vec_model.save('root/models/sa/w2v_model')
+	joblib.dump(tfidf, 'root/models/sa/tfidf_sa.pkl')
+	joblib.dump(pca_emb, 'root/models/sa/pca_emb.pkl')
+	joblib.dump(pca_tfidf, 'root/models/sa/pca_tfidf.pkl')
 	# features_df.to_csv("../data/sa/features_train_sa.csv", index=False)
 	return features_df
 
@@ -196,6 +197,57 @@ def SA_PREPROCESS_TEST(raw_data):
 	SA_PROCESSED_DF_XGB = PREPROCESS_XGB(cleaned_data)
 	SA_PROCESSED_DF_FLAIR = PREPROCESS_FLAIR(raw_data)
 	return SA_PROCESSED_DF_XGB, SA_PROCESSED_DF_FLAIR
+
+def final_full_data_preprocess(test_data):
+
+	# Load the model
+	# load model for test data
+	word2vec_model = Word2Vec.load('root/models/sa/w2v_model')
+	tfidf = joblib.load('root/models/sa/tfidf_sa.pkl')
+	pca_emb = joblib.load('root/models/sa/pca_emb.pkl')
+	pca_tfidf = joblib.load('root/models/sa/pca_tfidf.pkl')
+
+	# apply the augmentation function to the preprocessed text data
+	test_data = augment_train(test_data)
+	print("Shape after augmenting negative training samples: ", test_data.shape)
+
+	# apply the preprocessing function to the text data
+	test_data['Text'] = test_data['Text'].apply(sa_preprocess)
+
+	## Features
+	# train a Word2Vec model on the preprocessed text data
+	test_embeddings = test_data['Text'].apply(lambda x: np.mean([word2vec_model.wv[Text] for Text in x if Text in word2vec_model.wv.key_to_index], axis=0))
+
+	# create a new DataFrame for the feature matrix
+	features_df = pd.DataFrame(test_embeddings.tolist(), index=test_embeddings.index)
+
+	# perform PCA with n_components set to retain 98% of variance
+	features_emb_pca = pca_emb.transform(features_df)
+
+	# create a new DataFrame for the PCA features
+	pca_emb_cols = [f"PC_emb{i+1}" for i in range(features_emb_pca.shape[1])]
+	pca_df_emb = pd.DataFrame(features_emb_pca, columns=pca_emb_cols)
+	
+	# obtain the TF-IDF feature matrix for the training and test data
+	test_matrix = tfidf.transform(test_data['Text'].apply(lambda x: ' '.join(x))).toarray()
+	tfidf_features_df = pd.DataFrame(test_matrix, columns=tfidf.get_feature_names_out())
+
+	# perform PCA with n_components set to retain 95% of variance
+	features_tfidf_pca = pca_tfidf.transform(tfidf_features_df)
+
+	# create a new DataFrame for the PCA features
+	pca_tfidf_cols = [f"PC_tfidf{i+1}" for i in range(features_tfidf_pca.shape[1])]
+	pca_df_tfidf = pd.DataFrame(features_tfidf_pca, columns=pca_tfidf_cols)
+
+	# add the TF-IDF features to the feature matrix DataFrame
+	features_df = pd.concat([pca_df_tfidf, pca_df_emb], axis=1)
+
+	features_df['Sentiment'] = test_data['Sentiment']
+	features_df['Sentiment'] = features_df['Sentiment'].apply(lambda x: 1 if x == 'positive' else 0)
+	
+	return features_df
+
+
 
 if __name__ == "__main__":
 
