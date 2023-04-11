@@ -1,7 +1,15 @@
 import pandas as pd
 import os
+import pytest
 
 from ..src.preprocessing.rawdata_preprocessing import *
+
+@pytest.fixture
+def generate_data():
+	os.chdir(r"./root/unit_testing")
+	in_df = pd.read_csv(r"./testcase/input/test_rawdata_preprocessing_input.csv")
+	out_df = pd.read_csv(r"./testcase/output/test_rawdata_preprocessing_output.csv")
+	return in_df, out_df
 
 # contraction
 def test_remove_contraction(in_df, out_df):
@@ -59,18 +67,18 @@ def test_preprocess_text(in_df, out_df):
 	for in_value, out_value in zip(in_text, out_text):
 		assert preprocess_text(in_value) == out_value
 
-if __name__ == "__main__":
-	os.chdir(r"./root/unit_testing")
-	input_df = pd.read_csv(r"./testcase/input/test_rawdata_preprocessing_input.csv")
-	output_df = pd.read_csv(r"./testcase/output/test_rawdata_preprocessing_output.csv")
+# if __name__ == "__main__":
+# 	os.chdir(r"./root/unit_testing")
+# 	input_df = pd.read_csv(r"./testcase/input/test_rawdata_preprocessing_input.csv")
+# 	output_df = pd.read_csv(r"./testcase/output/test_rawdata_preprocessing_output.csv")
 
-	test_remove_contraction(input_df, output_df)
-	test_remove_emoji(input_df, output_df)
-	test_remove_html(input_df, output_df)
-	test_remove_word_containing_digits_symbols(input_df, output_df)
-	test_remove_digits(input_df, output_df)
-	test_remove_punctuations(input_df, output_df)
-	test_remove_extra_spaces(input_df, output_df)
-	test_preprocess_text(input_df, output_df)
+# 	test_remove_contraction(input_df, output_df)
+# 	test_remove_emoji(input_df, output_df)
+# 	test_remove_html(input_df, output_df)
+# 	test_remove_word_containing_digits_symbols(input_df, output_df)
+# 	test_remove_digits(input_df, output_df)
+# 	test_remove_punctuations(input_df, output_df)
+# 	test_remove_extra_spaces(input_df, output_df)
+# 	test_preprocess_text(input_df, output_df)
 
-	print("All Tests Passed")
+# 	print("All Tests Passed")
