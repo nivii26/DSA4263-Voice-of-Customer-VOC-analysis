@@ -6,14 +6,42 @@ import numpy as np
 import xgboost as xgb
 from xgboost import XGBClassifier
 
+# For svm
+from sklearn.svm import NuSVC 
+
 # For flair
 from flair.nn import Classifier
 from flair.data import Sentence
+import joblib
+
+
+def svm_predict(test_data, mode):
+
+    # Load the trained SVM model
+    if mode == 'train':
+        svm = joblib.load("root/models/sa/svm_model.pkl")
+    else: 
+        svm = joblib.load("root/models/sa/final_svm_model.pkl")
+
+    # Predict probabilities and sentiment
+    svm_probs = svm.predict_proba(test_data)
+    svm_sentiment = svm.predict(test_data)
+
+    svm_probs_df = pd.DataFrame(data = svm_probs, columns = ['NEGATIVE', 'POSITIVE'])
+
+    # Store SVM predictions into results dataframe
+    results_svm = pd.DataFrame()
+    results_svm['svm_sentiment'] = np.array(svm_sentiment)
+    results_svm['svm_prob'] = svm_probs_df['POSITIVE']
+
+    return results_svm
+
+
 
 def XGB_predict(XGB_data):
     # Load the trained XGBoost model
     model_xgb =  XGBClassifier()
-    model_xgb.load_model("./root/models/sa/xgb_model.json")
+    model_xgb.load_model("models/sa/xgb_model.json")
     
     # Predict probabilities and sentiment
     xgb_probs = model_xgb.predict_proba(XGB_data)
@@ -33,6 +61,7 @@ def XGB_predict(XGB_data):
     results_xgb['xgb_prob'] = xgb_probs_df['POSITIVE']
 
     return results_xgb
+
 
 
 def flair_predict(flair_data):
@@ -80,11 +109,12 @@ def flair_predict(flair_data):
 
 
 
-def SA_MODEL_PREDICT(SA_PROCESSED_DF_XGB, SA_PROCESSED_DF_FLAIR):
+def ensemble_xgb_flair(SA_PROCESSED_DF_XGB, SA_PROCESSED_DF_FLAIR):
     '''
     inputs : DataFrames with processed data for XGBoost and Flair respectively
     output : DataFrame with final class predictions and probability of predictions
     '''
+
     time = SA_PROCESSED_DF_FLAIR['Time']
     text = SA_PROCESSED_DF_FLAIR['Text']
     ### Model 1: Flair
@@ -116,16 +146,38 @@ def SA_MODEL_PREDICT(SA_PROCESSED_DF_XGB, SA_PROCESSED_DF_FLAIR):
     return results # results['Sentiment'] is the final predicted sentiment (positive/negative)
 
 
-'''
-def main():
-    df_xgb = pd.read_csv('/Users/nnerella/Documents/GitHub/SA_model/XGB_data/features_test_XGB.csv', index_col = [0])
-    df_flair = pd.read_csv('/Users/nnerella/Documents/GitHub/DSA4263-Voice-of-Customer-VOC-analysis/data/raw/reviews.csv')
-    test = df_xgb.iloc[: , 1:]
-    test = test.iloc[: , :-1]
-    results = sa_model_predict(test[0:10], df_flair[0:10])
 
-# calling the main function
-if __name__ == "__main__":
-     main()
+def SA_MODEL_PREDICT(SA_PROCESSED_DF_SVM, SA_PROCESSED_DF_FLAIR, mode):
+    '''
+    inputs : DataFrames with processed data for XGBoost and Flair respectively, mode = train|predict
+    output : DataFrame with final class predictions and probability of predictions
+    '''
+    time = SA_PROCESSED_DF_FLAIR['Time']
+    text = SA_PROCESSED_DF_FLAIR['Text']
+    ### Model 1: Flair
+    flair_predictions = flair_predict(SA_PROCESSED_DF_FLAIR)
 
-'''
+    ### Model 2: XGBoost
+    svm_predictions = svm_predict(SA_PROCESSED_DF_SVM, mode)
+
+    # Create a new dataframe to store all results
+    results = pd.DataFrame()
+    results['flair_sentiment'] = flair_predictions['flair_sentiment']
+    results['flair_prob'] = flair_predictions['flair_prob']
+
+    results['svm_sentiment'] = svm_predictions['svm_sentiment']
+    results['svm_prob'] = svm_predictions['svm_prob']
+    
+    label_map_3 = {
+    1 : 'positive',
+    0 : 'negative',
+    }
+    
+    ## Final: Ensemble of Flair and XGBoost predictions
+    results['avg_prob'] = (results['flair_prob'] + results['svm_prob']) / 2
+    results['final_sentiment'] = np.where(results['avg_prob'] > 0.5, 1, 0)
+    results['Sentiment'] = results['final_sentiment'].map(label_map_3)
+
+    results['Time'] = np.array(time)
+    results['Text'] = np.array(text)
+    return results # results['Sentiment'] is the final predicted sentiment (positive/negative)
