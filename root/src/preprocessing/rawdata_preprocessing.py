@@ -69,13 +69,14 @@ def preprocess_text(reviewText):
 	reviewText = remove_extra_spaces(reviewText)
 	return reviewText
 
-def PREPROCESS_RAW(RAW_DF, CURRENT_TIME="", SAVE=False):
-	if SAVE:
-		ProfileReport(RAW_DF).to_file(rf'./processed/report/{CURRENT_TIME}_DATA_REPORT.html')
+def PREPROCESS_RAW(RAW_DF, CURRENT_TIME="", SAVE=True):
 	## Clean the data
 	CLEANED_DF = RAW_DF.dropna().drop_duplicates()
 	## Preprocess the Review Column
 	CLEANED_DF["Text"] = CLEANED_DF["Text"].apply(preprocess_text)
+	#if SAVE:
+	#	ProfileReport(RAW_DF).to_file(rf'./root/data/processed/report/{CURRENT_TIME}_DATA_REPORT.html')
+	#	CLEANED_DF.to_csv(rf"./root/data/processed/{CURRENT_TIME}_CLEANED_DF.csv")
 	return CLEANED_DF
 
 # FOR RUNNING LOCALLY
