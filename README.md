@@ -37,6 +37,7 @@ TASK 1 : Sentiment Analysis
 
 TASK 2 : Topic Modeling
 
+To train the topic model from outside of the root directory, run: ```python -m root.src.model.tm.tm_train```. This will train and deposit a topic model into root/models/tm/. Configuration of the training hyperparameters is specified in root/src/model/tm/config.yml.
+
 TASK 3 : Visualisation
 
-## How to run the code
