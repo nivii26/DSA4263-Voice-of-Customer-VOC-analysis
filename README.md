@@ -25,7 +25,7 @@ Run
 
 The app is hosted on ```localhost (127.0.0.1)``` at port ```5000```. API documentation is available at ```127.0.0.1:5000/docs```
 
-![image](./root/src/assets/swagger.JPG)
+![image](./root/src/assets/swagger.jpg)
 
 Some usage examples can be found in the [api_demo notebook](https://https://github.com/nivii26/DSA4263-Voice-of-Customer-VOC-analysis/tree/main/root/ipynb/api_demo.ipynb)
 

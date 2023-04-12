@@ -5,7 +5,7 @@ from ..src.preprocessing.rawdata_preprocessing import *
 from ..src.preprocessing.sa_preprocessing import *
 
 
-
+@pytest.fixture
 def sample_documents():
     sentiment = ["positive", "negative"]
     time = ["18/6/21", "29/7/19"]
@@ -19,7 +19,8 @@ def sample_documents():
     return df_xgb, df_flair
 
 
-def test_svm(df_xgb):
+def test_svm(sample_documents):
+    df_xgb, df_flair = sample_documents
     prediction = svm_predict(df_xgb,"test")
 
     assert isinstance(prediction, pd.DataFrame)
@@ -39,7 +40,8 @@ def test_svm(df_xgb):
     assert flag_label is True
 
 
-def test_xgb(df_xgb):
+def test_xgb(sample_documents):
+    df_xgb, df_flair = sample_documents
     prediction = XGB_predict(df_xgb)
 
     assert isinstance(prediction, pd.DataFrame)
@@ -57,7 +59,8 @@ def test_xgb(df_xgb):
                 flag_label = True
     assert flag_label is True
 
-def test_flair(df_flair):
+def test_flair(sample_documents):
+    df_xgb, df_flair = sample_documents
     prediction = flair_predict(df_flair)
 
     assert isinstance(prediction, pd.DataFrame)
@@ -75,7 +78,8 @@ def test_flair(df_flair):
                 flag_label = True
     assert flag_label is True
 
-def test_merge(df_xgb, df_flair):
+def test_merge(sample_documents):
+    df_xgb, df_flair = sample_documents
     prediction = ensemble_xgb_flair(df_xgb, df_flair)
 
     assert isinstance(prediction, pd.DataFrame)
@@ -102,7 +106,8 @@ def test_merge(df_xgb, df_flair):
 
 
 
-def test_final(df_xgb, df_flair):
+def test_final(sample_documents):
+    df_xgb, df_flair = sample_documents
     prediction = SA_MODEL_PREDICT(df_xgb, df_flair, "test")
 
     assert isinstance(prediction, pd.DataFrame)
@@ -127,12 +132,12 @@ def test_final(df_xgb, df_flair):
 
 
 
-if __name__ == "__main__":
-    # os.chdir(r"./root/unit_testing")
-    df_xgb, df_flair = sample_documents()
-    test_svm(df_xgb)
-    test_xgb(df_xgb)
-    test_flair(df_flair)
-    test_merge(df_xgb, df_flair)
-    test_final(df_xgb, df_flair)
-    print("All Tests Passed")
+# if __name__ == "__main__":
+#     # os.chdir(r"./root/unit_testing")
+#     df_xgb, df_flair = sample_documents()
+#     test_svm(df_xgb)
+#     test_xgb(df_xgb)
+#     test_flair(df_flair)
+#     test_merge(df_xgb, df_flair)
+#     test_final(df_xgb, df_flair)
+#     print("All Tests Passed")
