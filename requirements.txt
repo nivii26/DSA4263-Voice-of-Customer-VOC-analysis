@@ -17,7 +17,7 @@ demoji
 nlpaug
 
 # Modelling
-sklearn
+scikit-learn
 scipy
 imblearn
 xgboost
@@ -31,4 +31,3 @@ pytest
 
 # Config
 pyyaml
-typing
