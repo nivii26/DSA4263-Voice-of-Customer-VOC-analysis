@@ -5,6 +5,7 @@ import pandas as pd
 from ..src.preprocessing.rawdata_preprocessing import *
 from ..src.preprocessing.sa_preprocessing import *
 
+@pytest.fixture
 def test_augment_train():
     # create a sample dataframe
     train_data = pd.DataFrame({
