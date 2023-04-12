@@ -1,8 +1,10 @@
-# TODO: Version Matching
 # Basic requirements
 pandas
 numpy
 joblib
+matplotlib
+tqdm 
+
 
 # API requirements
 requests
@@ -20,7 +22,6 @@ nlpaug
 # Modelling
 scikit-learn
 scipy
-imblearn
 xgboost
 flair
 
