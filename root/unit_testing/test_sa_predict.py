@@ -14,7 +14,6 @@ def sample_documents():
         "THis product is definitely not as good as some other gluten free cookies!",
     ]
     df = pd.DataFrame({"Time": time, "Text": text})
-    df = PREPROCESS_RAW(df)
     df_xgb, df_flair = SA_PREPROCESS_TEST(df)
     return df_xgb, df_flair
 
