@@ -149,7 +149,7 @@ def ensemble_xgb_flair(SA_PROCESSED_DF_XGB, SA_PROCESSED_DF_FLAIR):
 
 def SA_MODEL_PREDICT(SA_PROCESSED_DF_SVM, SA_PROCESSED_DF_FLAIR, mode):
     '''
-    inputs : DataFrames with processed data for XGBoost and Flair respectively, mode = train|predict
+    inputs : DataFrames with processed data for SVMand Flair respectively, mode = train|predict
     output : DataFrame with final class predictions and probability of predictions
     '''
     time = SA_PROCESSED_DF_FLAIR['Time']
@@ -157,7 +157,7 @@ def SA_MODEL_PREDICT(SA_PROCESSED_DF_SVM, SA_PROCESSED_DF_FLAIR, mode):
     ### Model 1: Flair
     flair_predictions = flair_predict(SA_PROCESSED_DF_FLAIR)
 
-    ### Model 2: XGBoost
+    ### Model 2: SVM
     svm_predictions = svm_predict(SA_PROCESSED_DF_SVM, mode)
 
     # Create a new dataframe to store all results
@@ -173,7 +173,7 @@ def SA_MODEL_PREDICT(SA_PROCESSED_DF_SVM, SA_PROCESSED_DF_FLAIR, mode):
     0 : 'negative',
     }
     
-    ## Final: Ensemble of Flair and XGBoost predictions
+    ## Final: Ensemble of Flair and SVM predictions
     results['avg_prob'] = (results['flair_prob'] + results['svm_prob']) / 2
     results['final_sentiment'] = np.where(results['avg_prob'] > 0.5, 1, 0)
     results['Sentiment'] = results['final_sentiment'].map(label_map_3)
