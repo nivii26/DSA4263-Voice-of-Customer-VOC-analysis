@@ -5,12 +5,6 @@ import string
 import pandas as pd
 from ydata_profiling import ProfileReport
 
-# Gensim
-import gensim
-from gensim import corpora
-from gensim.utils import simple_preprocess
-from gensim.parsing.preprocessing import STOPWORDS
-
 # Other NLP libraries
 import contractions
 import demoji
