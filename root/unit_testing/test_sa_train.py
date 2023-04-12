@@ -6,7 +6,7 @@ import pandas as pd
 from ..src.preprocessing.rawdata_preprocessing import *
 from ..src.preprocessing.sa_preprocessing import *
 
-
+@pytest.fixture
 def sample_documents(df):
     df_train, df_test = sa_train_test_split(df)
     df_train = SA_PREPROCESS_TRAIN(df_train)
