@@ -1,20 +1,22 @@
-FROM ubuntu:22.04
+# syntax=docker/dockerfile:1
+
+FROM python:3.8-slim-buster
+
+ENV LISTEN_PORT=5000
+EXPOSE 5000
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y python3
-
 # Install Dependencies
-COPY ./requirements.txt /app
-RUN pip install --no-cache-dir --upgrade -r requirements.txt
+COPY requirements.txt .
+RUN python -m pip install --upgrade pip
+RUN pip3 install -r requirements.txt
 
 # Set Timezone
 ENV TZ=Asia/Singapore
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # copy all scripts
-COPY . /app
+COPY /root /app/root
 
-WORKDIR /root/src
-
-ENTRYPOINT ["uvicorn", "main:app", "--port", "5000", "--host", "0.0.0.0"]
+ENTRYPOINT ["uvicorn", "--app-dir=./root/src", "main:app", "--port", "5000", "--host", "0.0.0.0"]
