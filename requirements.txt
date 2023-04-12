@@ -27,6 +27,8 @@ flair
 
 # Visualization Tools
 pandas-profiling
+streamlit
+Circlify
 
 # Unit-Testing
 pytest
