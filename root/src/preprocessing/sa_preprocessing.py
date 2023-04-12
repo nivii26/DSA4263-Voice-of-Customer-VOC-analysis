@@ -1,18 +1,21 @@
+# Basic requirements
 import pandas as pd
+import numpy as np
 import os
-import nltk
 import random
-import nlpaug.augmenter.word as naw
+import datetime
+
+# for saving models
+import joblib
+
+# For pre-processing
+import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
-import numpy as np
 from gensim.models import Word2Vec
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import PCA
-import datetime
-import joblib
-
 from .rawdata_preprocessing import PREPROCESS_RAW, remove_html
 
 # download necessary NLTK data (only need to run this once)
@@ -21,6 +24,11 @@ nltk.download('wordnet')
 nltk.download('stopwords')
 
 def sa_preprocess(text):
+	'''
+    input : raw text DataFrame
+    output : tokens
+    function : tokenize and other initial processing of text data
+    '''
 	# tokenize the text into words
 	tokens = word_tokenize(text)
 	# remove stopwords
@@ -31,8 +39,14 @@ def sa_preprocess(text):
 	tokens = [lemmatizer.lemmatize(word) for word in tokens]
 	return tokens
 
-# Function to augment negative training data
+
 def augment_train(train_data):
+	'''
+    input : train_data DataFrame
+    output : augumented train_data
+    function : augment negative training data
+    '''
+
 	positive_texts = train_data[train_data['Sentiment'] == 'positive']['Text'].tolist()
 	negative_texts = train_data[train_data['Sentiment'] == 'negative']['Text'].tolist()
 	# Over-sample negative training examples using nlp-aug
@@ -46,13 +60,15 @@ def augment_train(train_data):
 	return train_data
 
 def PREPROCESS_XGB(test_data):
+	"""
+	Input: test_data(dataframe)-cleaned data
+	Output: processed test data 
+	function: preprocess test data for xgb and other non-transformer based models
+	"""
 
 	if 'Sentiment' in test_data.columns.to_list():
 		s = test_data['Sentiment']
-	"""
-	Input: test_data(dataframe)-cleaned data
-	Output: features_df(dataframe)
-	"""
+
 	# load model for test data
 	word2vec_model = Word2Vec.load('root/models/sa/w2v_model')
 	tfidf = joblib.load('root/models/sa/tfidf_sa.pkl')
@@ -101,6 +117,7 @@ def PREPROCESS_FLAIR(raw_data):
 	"""
 	Input: raw_data(dataframe)
 	Output: final_cleaned_data_flair(dataframe)
+	function: preprocess test data for flair and other transformer based models
 	"""
 	if 'Sentiment' in raw_data.columns:
 		final_cleaned_data_flair = pd.DataFrame(columns=["Sentiment", "Time", "Text"])
@@ -126,6 +143,7 @@ def SA_PREPROCESS_TRAIN(train_data):
 	"""
 	Input: train_data(dataframe) - cleaned data
 	Output: features_df(dataframe), SAVE : word2vec_model, tfidf, pca_emb, pca_tfidf 
+	function: preprocess training data 
 	"""
 	# apply the augmentation function to the preprocessed text data
 	train_data = augment_train(train_data)
@@ -190,6 +208,7 @@ def SA_PREPROCESS_TEST(raw_data):
 	"""
 	Input: raw_data(dataframe)
 	Output: SA_PROCESSED_DF_XGB, SA_PROCESSED_DF_FLAIR
+	function: preprocess test data for two kinds of models seperately 
 	"""
 	cleaned_data = PREPROCESS_RAW(raw_data)
 	SA_PROCESSED_DF_XGB = PREPROCESS_XGB(cleaned_data)
