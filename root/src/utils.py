@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import requests
 import zipfile
 
 from preprocessing import TM_PREPROCESS_TEST, SA_PREPROCESS_TEST
@@ -37,27 +38,26 @@ def generate_predictions(RAW_DF, CURRENT_TIME, SAVE=True):
     1. Raw DataFrame with columns ["Time", "Text"]
     2. CURRENT_TIME at which the request is made
     3. If SAVE=True, save a copy of all DF name tracked using CURRENT_TIME
-    RAW -> ../data/raw
-    CLEANED -> ../data/processed
-    SA -> ./data/sa
-    TM -> ./data/tm
+    RAW -> ./root/data/raw
+    CLEANED -> ./root/data/processed
+    SA -> ./root/src/data/sa
+    TM -> ./root/src/data/tm
 
     Output:
-    1. SA_PREDICTIONS_DF: DataFrame ["Time", "Text", "Sentiment"] # Sentiment Values: "positive" or "negative"
-    2. TM_POS_PRED_DF: DataFrame for positive sentiments ["Time", "Text", "Sentiment", "Topic"]
-    3. TM_NEG_PRED_DF: DataFrame for negative sentiments ["Time", "Text", "Sentiment", "Topic"]
+    1. SA_PREDICTIONS_DF: DataFrame ["Time", "Text", "Sentiment", "avg_prob"] # Sentiment Values: "positive" or "negative"
+    2. TM_PREDICTIONS_DF: DataFrame for positive sentiments ["Time", "Text", "Sentiment", "Predicted Topic"]
     """
     # SA Preprocessing
-    SA_PROCESSED_DF_XGB, SA_PROCESSED_DF_FLAIR = SA_PREPROCESS_TEST(RAW_DF)
+    SA_PROCESSED_DF_SVM, SA_PROCESSED_DF_FLAIR = SA_PREPROCESS_TEST(RAW_DF)
     # SA Predictions
-    SA_PREDICTIONS_DF = SA_MODEL_PREDICT(SA_PROCESSED_DF_XGB, SA_PROCESSED_DF_FLAIR)
+    SA_PREDICTIONS_DF = SA_MODEL_PREDICT(SA_PROCESSED_DF_SVM, SA_PROCESSED_DF_FLAIR, "predict")
     # TM Preprocessing
     TM_DF = TM_PREPROCESS_TEST(SA_PREDICTIONS_DF)
     # TM Predictions
     TM_PREDICTIONS_DF = TM_MODEL_PREDICT(TM_DF)
     if SAVE:
         RAW_DF.to_csv(fr"./root/data/raw/{CURRENT_TIME}_RAW_DF.csv", index=False)
-        SA_PROCESSED_DF_XGB.to_csv(fr"./root/src/data/sa/{CURRENT_TIME}_SA_PROCESSED_DF_XGB.csv", index=False)
+        SA_PROCESSED_DF_SVM.to_csv(fr"./root/src/data/sa/{CURRENT_TIME}_SA_PROCESSED_DF_SVM.csv", index=False)
         SA_PROCESSED_DF_FLAIR.to_csv(fr"./root/src/data/sa/{CURRENT_TIME}_SA_PROCESSED_DF_FLAIR.csv", index=False)
         SA_PREDICTIONS_DF.to_csv(fr"./root/src/data/sa/{CURRENT_TIME}_SA_PRED_DF.csv", index=False)
         TM_DF.to_csv(fr"./root/src/data/tm/{CURRENT_TIME}_TM_DF.csv", index=False)
@@ -66,37 +66,94 @@ def generate_predictions(RAW_DF, CURRENT_TIME, SAVE=True):
 
 # Retrieving results
 def retrieve_raw_data(CURRENT_TIME):
-    if f"{CURRENT_TIME}_RAW_DF.csv" in os.listdir(r"../data/raw"):
-        data = pd.read_csv(fr"../data/raw/{CURRENT_TIME}_RAW_DF.csv")
+    if f"{CURRENT_TIME}_RAW_DF.csv" in os.listdir(r"./root/data/raw"):
+        data = pd.read_csv(fr"./root/data/raw/{CURRENT_TIME}_RAW_DF.csv")
         return data
     return None
 
-def retrieve_cleaned_data(CURRENT_TIME):
-    if f"{CURRENT_TIME}_CLEANED_DF.csv" in os.listdir(r"../data/processed"):
-        data = pd.read_csv(fr"../data/processed/{CURRENT_TIME}_CLEANED_DF.csv")
-        return data
-    return None
+# def retrieve_cleaned_data(CURRENT_TIME):
+#     if f"{CURRENT_TIME}_CLEANED_DF.csv" in os.listdir(r"./root/data/processed"):
+#         data = pd.read_csv(fr"./root/data/processed/{CURRENT_TIME}_CLEANED_DF.csv")
+#         return data
+#     return None
 
-def retrieve_data_report(CURRENT_TIME):
-    if f"{CURRENT_TIME}_DATA_REPORT.html" in os.listdir(r"../data/processed/report"):
-        path = fr"../data/processed/report/{CURRENT_TIME}_DATA_REPORT.html"
-        return path
-    return None
+# def retrieve_data_report(CURRENT_TIME):
+#     if f"{CURRENT_TIME}_DATA_REPORT.html" in os.listdir(r"./root/data/processed/report"):
+#         path = fr"./root/data/processed/report/{CURRENT_TIME}_DATA_REPORT.html"
+#         return path
+#     return None
 
 def retrieve_sa_pred(CURRENT_TIME):
-    if f"{CURRENT_TIME}_SA_PRED_DF.csv" in os.listdir(r"./data/sa"):
-        data = pd.read_csv(fr"./data/sa/{CURRENT_TIME}_SA_PRED_DF.csv")
+    if f"{CURRENT_TIME}_SA_PRED_DF.csv" in os.listdir(r"./root/src/data/sa"):
+        data = pd.read_csv(fr"./root/src/data/sa/{CURRENT_TIME}_SA_PRED_DF.csv")
         return data
     return None
 
-def retrieve_tm_pred(CURRENT_TIME, SENTIMENT):
-    if f"{CURRENT_TIME}_TM_{SENTIMENT}_PRED_DF.csv" in os.listdir(r"./data/tm"):
-        data = pd.read_csv(fr"./data/tm/{CURRENT_TIME}_TM_{SENTIMENT}_PRED_DF.csv")
+def retrieve_tm_pred(CURRENT_TIME):
+    if f"{CURRENT_TIME}_TM_PRED_DF.csv" in os.listdir(r"./root/src/data/tm"):
+        data = pd.read_csv(fr"./root/src/data/tm/{CURRENT_TIME}_TM_PRED_DF.csv")
         return data
     return None
 
-# TODO: Implement Visualizations 
+# Access Endpoints
+def predict_file(url, dir, fname):
+    endpoint = "predict"
+    url = f"{url}/{endpoint}"
+    file = open(f"{dir}/{fname}", "rb")
 
-# TODO: Test the API TO SEE IF IT WORKS -> NEED MODEL TO BE CREATED AND LOADED in MODEL_PREDICT
+    response = requests.post(url, files={"file":(fname,file)})
+
+    if response.status_code == 200:
+        with open("test_predictions.zip","wb") as pred_file:
+            pred_file.write(response.content)
+            pred_file.close()
+    else:
+        print("Error!", response.text)
+    file.close()
+
+def request_raw_data(url, id):
+    endpoint = "raw_data"
+    url = f"{url}/{endpoint}"
+    response  = requests.post(url, data={"CURRENT_TIME":{id}})
+    if response.status_code == 200:
+        return response.content
+    else:
+        print("Error!", response.text)
+
+# def request_data_report(url, id):
+#     endpoint = "data_report"
+#     url = f"{url}/{endpoint}"
+#     response  = requests.post(url, data={"CURRENT_TIME":{id}})
+#     if response.status_code == 200:
+#         return response.content
+#     else:
+#         print("Error!", response.text)
+
+# def request_cleaned_data(url, id):
+#     endpoint = "cleaned_data"
+#     url = f"{url}/{endpoint}"
+#     response  = requests.post(url, data={"CURRENT_TIME":{id}})
+#     if response.status_code == 200:
+#         return response.content
+#     else:
+#         print("Error!", response.text)
+    
+def request_sa_pred_data(url, id):
+    endpoint = "sa_pred"
+    url = f"{url}/{endpoint}"
+    response  = requests.post(url, data={"CURRENT_TIME":{id}})
+    if response.status_code == 200:
+        return response.content
+    else:
+        print("Error!", response.text)
+
+def request_tm_pred_data(url, id):
+    endpoint = "tm_pred"
+    url = f"{url}/{endpoint}"
+    response  = requests.post(url, data={"CURRENT_TIME":{id}})
+    if response.status_code == 200:
+        return response.content
+    else:
+        print("Error!", response.text)
 
 

@@ -1,12 +1,10 @@
-import requests
-import os
 import datetime
 import pandas as pd
 import fastapi
 import zipfile
 from utils import *
 from io import BytesIO
-from fastapi.responses import HTMLResponse, FileResponse, Response
+from fastapi.responses import HTMLResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.exceptions import HTTPException
@@ -46,13 +44,15 @@ async def predict_upload_csv(file: fastapi.UploadFile = fastapi.File(...)):
     """
     CURRENT_TIME = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
     expected_columns = set(["Time", "Text"])
-    if file.content_type == "application/zip" or "application/x-zip-compressed":
+    if file.filename.endswith(".zip"):
+    #if file.content_type in ("application/zip", "application/x-zip-compressed"):
         content = file.file.read()
         fileReadBuffer = BytesIO(content)
         master_df = zip_preprocess(fileReadBuffer, expected_columns)
         if set(master_df.columns) != expected_columns:
             raise "Unexpected columns in DataFrame. Expected: {expected_columns}. Actual: {set(master_df.columns)}"
-    elif file.content_type in ["text/csv", "application/csv"]:
+    elif file.filename.endswith(".csv"):
+    #elif file.content_type in ["text/csv", "application/csv"]:
         master_df = pd.read_csv(file.file)
         if set(master_df.columns) != expected_columns:
             raise "Unexpected columns in DataFrame. Expected: {expected_columns}. Actual: {set(master_df.columns)}"
@@ -81,23 +81,23 @@ async def get_raw_data(CURRENT_TIME: int):
         return Response(retrieve_raw_data(CURRENT_TIME).to_json(orient="records"), media_type="application/json")
     return None
 
-@app.get("/api/data_report")
-async def get_data_report(CURRENT_TIME: int):
-    """
-    Endpoint to look at the Basic EDA of the raw_data submitted
-    """
-    if CURRENT_TIME:
-        return FileResponse(retrieve_data_report(CURRENT_TIME), media_type="text/html")
-    return None
+# @app.get("/api/data_report")
+# async def get_data_report(CURRENT_TIME: int):
+#     """
+#     Endpoint to look at the Basic EDA of the raw_data submitted
+#     """
+#     if CURRENT_TIME:
+#         return FileResponse(retrieve_data_report(CURRENT_TIME), media_type="text/html")
+#     return None
 
-@app.get("/api/cleaned_data")
-async def get_cleaned_data(CURRENT_TIME: int):
-    """
-    Endpoint to look at the Basic EDA of the raw_data submitted
-    """
-    if CURRENT_TIME:
-        return Response(retrieve_cleaned_data(CURRENT_TIME).to_json(orient="records"), media_type="application/json")
-    return None
+# @app.get("/api/cleaned_data")
+# async def get_cleaned_data(CURRENT_TIME: int):
+#     """
+#     Endpoint to look at the Basic EDA of the raw_data submitted
+#     """
+#     if CURRENT_TIME:
+#         return Response(retrieve_cleaned_data(CURRENT_TIME).to_json(orient="records"), media_type="application/json")
+#     return None
 
 @app.get("/api/sa_pred")
 async def get_semantic_predictions(CURRENT_TIME: int):
@@ -109,12 +109,14 @@ async def get_semantic_predictions(CURRENT_TIME: int):
     return None
 
 @app.get("/api/tm_pred")
-async def get_tm_predictions(CURRENT_TIME: int, SENTIMENT="POS"):
+async def get_tm_predictions(CURRENT_TIME: int):
     """
     Endpoint to look at the predictions by the TM model
     """
-    if SENTIMENT not in ["POS", "NEG"]:
-        raise "Unexpected Sentiment Value. Sentiment value must be 'POS' or 'NEG', DEFAULT: 'POS'"
     if CURRENT_TIME:
-        return Response(retrieve_tm_pred(CURRENT_TIME, SENTIMENT.upper()).to_json(orient="records"), media_type="application/json")
+        return Response(retrieve_tm_pred(CURRENT_TIME).to_json(orient="records"), media_type="application/json")
     return None
+
+@app.get("/api/visualiation")
+async def get_tableau(CURRENT_TIME):
+    pass
