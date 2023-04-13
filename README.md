@@ -10,20 +10,33 @@ The Voice of the Customer (VoC) is a methodology used to capture customers’ ne
 
 Run  
 
-```docker build -t api .```  
-```docker run -d -p 5000:5000 api```
+```
+docker build -t api .
+```  
+```
+docker run -d -p 5000:5000 api
+```
 
 2. **Virtual Environment**
 
 - Create a virtual environment of your choice; eg:
-```virtualenv venv```
+```
+virtualenv venv
+```
 - Activate virtual environment & Install dependencies
-```source venv/Scripts/activate```
-```pip install -r requirements.txt```
+```
+source venv/Scripts/activate
+```
+```
+pip install -r requirements.txt
+```
 - Run the API with
-```uvicorn --app-dir=./root/src main:app --port 5000```
+```
+uvicorn --app-dir=./root/src main:app --port 5000
+```
 
-The app is hosted on ```localhost (127.0.0.1)``` at port ```5000```. API documentation is available at ```127.0.0.1:5000/docs```
+The app is hosted on -
+```localhost (127.0.0.1)``` at port ```5000```. API documentation is available at ```127.0.0.1:5000/docs```
 
 ![image](./root/src/assets/swagger.jpg)
 
