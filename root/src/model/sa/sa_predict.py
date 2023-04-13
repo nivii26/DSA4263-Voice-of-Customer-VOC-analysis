@@ -125,3 +125,15 @@ def SA_MODEL_PREDICT(SA_PROCESSED_DF_SVM, SA_PROCESSED_DF_FLAIR, mode):
     results['Time'] = np.array(time)
     results['Text'] = np.array(text)
     return results # results['Sentiment'] is the final predicted sentiment (positive/negative)
+
+def scoring(MODEL_PREDICTIONS):
+    '''
+    inputs : DataFrame with final class predictions and probability of predictions
+    output :  dataframe["Text", Time", "predicted_sentiment_probability", "predicted_sentiment"]
+    function: generate a csv file with predicted sentiment probabilities
+    '''
+    MODEL_PREDICTIONS=MODEL_PREDICTIONS[['Text','Time','avg_prob','Sentiment']]
+    scoring_results=MODEL_PREDICTIONS.rename(columns={'avg_prob':'predicted_sentiment_probability', 'Sentiment':'predicted_sentiment'})
+    scoring_results.to_csv("reviews_test_predictions_CAJN.csv", index = False)
+
+    return scoring_results
