@@ -1,37 +1,36 @@
 # Basic requirements
-pandas
-numpy
-joblib
-matplotlib
-tqdm 
-
+pandas==1.5.3
+numpy==1.23.5
+joblib==1.2.0
+matplotlib==3.6.3
+tqdm==4.64.0
 
 # API requirements
-requests
-fastapi
-python-multipart
-uvicorn
+requests==2.27.1
+fastapi==0.95.0
+python-multipart==0.0.6
+uvicorn==0.21.1
 
 # NLP packages
-nltk
-gensim
-contractions 
-demoji
-nlpaug
+nltk==3.8.1
+gensim==4.3.1
+contractions==0.1.73
+demoji==1.1.0
+nlpaug==1.1.11
 
 # Modelling
-scikit-learn
-scipy
-xgboost
-flair
+scikit-learn==1.2.2
+scipy==1.9.3
+xgboost==1.7.5
+flair==0.12.2
 
 # Visualization Tools
-pandas-profiling
-streamlit
-Circlify
+pandas-profiling==3.6.6
+streamlit==1.0.0
+Circlify==0.15.0
 
 # Unit-Testing
-pytest
+pytest==7.1.1
 
 # Config
-pyyaml
+pyyaml==6.0
