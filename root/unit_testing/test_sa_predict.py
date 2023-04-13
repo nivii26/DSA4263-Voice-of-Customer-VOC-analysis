@@ -4,7 +4,8 @@ import pandas as pd
 from ..src.preprocessing.rawdata_preprocessing import *
 from ..src.preprocessing.sa_preprocessing import *
 
-
+# TODO: xgv -> svm
+# TODO: Remove XGB
 @pytest.fixture
 def sample_documents():
     sentiment = ["positive", "negative"]
