@@ -7,10 +7,10 @@ tfidf_model_file: tm_tfidf
 model_file: tm_model
 preprocess_type: tfidf
 topic_map:
-  '0': 'Coffee and tea flavor'
-  '1': 'Healthy and allergy-friendly snacks'
+  '0': 'Others'
+  '1': 'Healthy (Sugar and Gluten Free)'
   '2': 'Coffee and its complements'
-  '3': 'Locations and prices'
-  '4': 'Snack/Protein Bars'
-  '5': 'Flavoured cereal/nut/fruits bars and drink mix'
-  '6': 'Chocolate flavoured consumables and flavoured drinks'
+  '3': 'Dog food and Prices'
+  '4': 'Tea Time Snacks'
+  '5': 'Beverages and Flavoured bars'
+  '6': 'Chocolate, Coconut water, Sauces'

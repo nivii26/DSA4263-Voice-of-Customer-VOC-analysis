@@ -11,6 +11,7 @@ import numpy as np
 from datetime import date
 import seaborn as sns
 import circlify
+import argparse
 
 def generate_wordplot(df):
 
@@ -41,7 +42,7 @@ def generate_wordplot(df):
 
     # Slider select
     top_words = word_freq[:n]
-    wordcloud = WordCloud(width=800, height=800, background_color='white', stopwords=None, min_font_size=10).generate_from_frequencies(top_words)
+    wordcloud = WordCloud(width=800, height=500, background_color='white', stopwords=None, min_font_size=10, colormap='winter').generate_from_frequencies(top_words)
     
     # Plot wordcloud for selected topic
     plt.figure(figsize=(5,5), facecolor=None)
@@ -123,6 +124,53 @@ def sentiment_distribution(df):
     plt.show()
     c3.pyplot()
 
+def generate_wordplot_per_sentiment(df):
+
+    # Create container for this graph
+    c5 = st.container()
+
+    # Options in 'Main Topic' filter 
+    topics = df['Sentiment'].unique()
+    item = 'ALL'
+    topics = np.append(topics,item)
+
+    # Topic Filter
+    sel_topic = c5.selectbox('Select Sentiment', topics)
+    if sel_topic != "ALL": 
+        fil_df = df[df['Sentiment'] == sel_topic]  # filter
+        data = fil_df['Tokenized_text']
+
+        if sel_topic == 'positive':
+            c = 'YlGn'
+        else:
+            c = 'YlOrRd'
+        
+    else:
+        data = df['Tokenized_text']
+        c = 'BuPu'
+
+    # remove the quotes and commas from text   
+    data = data.str.replace(r"'", "")
+    data = data.str.replace(r",", "")
+
+    all_words = ' '.join(data)
+    word_freq = pd.Series(all_words.split()).value_counts()
+    
+    # Slider
+    n = c5.slider('Select number for top-N words:', 20, word_freq.size, (20,word_freq.size-20), 20)
+
+    # Slider select
+    top_words = word_freq[n[0]:n[1]]
+    wordcloud = WordCloud(width=800, height=300, background_color='white', stopwords=None, min_font_size=10, colormap=c).generate_from_frequencies(top_words)
+    
+    # Plot wordcloud for selected topic
+    plt.figure(figsize=(5,5), facecolor=None)
+    plt.imshow(wordcloud)
+    plt.axis("off")
+    plt.tight_layout(pad=0)
+    st.set_option('deprecation.showPyplotGlobalUse', False)
+    c5.pyplot()
+
 def topics_over_time(df):
     c4 = st.container()
     
@@ -201,34 +249,49 @@ def bubble(data, col):
     c5.pyplot()
 
 # Main function
-def main():
+def main(file_path):
     # Load the tokenized texts from a CSV file
-    data = pd.read_csv('/Users/nnerella/Downloads/lsa_7.csv')
+    #data = pd.read_csv('/Users/nnerella/Downloads/lsa_7.csv')
+    data = pd.read_csv(file_path)
 
     # Define Streamlit app
-    st.title('Voice of Customer: Analytics Dashboard')
+    st.title('The Voice of Customer (VoC) Analytics Dashboard')
     st.markdown('---')
 
-    ## Graph 1: Word Plot
-    st.header('Wordplot')
-    st.markdown('This plot displays the top N words in the selected topic of interest. Larger the word size in the word plot, the more frequently the word appears in the reviews under this topic. ')
-    # Generate the word plot
-    generate_wordplot(data)
+    ## Graph 1
+    st.header('Sentiment Distribution')
+    st.markdown('This plot displays percentage and count distribution of sentiments over the years as selected.')
+    sentiment_distribution(data)
+    
 
-    ## Graph 2: Distribution of Topics
+    ## Graph 2
+    st.header('Word Distribution per Sentiment')
+    st.markdown('This plot displays a wordplot for the selected sentiemnt')
+    generate_wordplot_per_sentiment(data)
+
+
+    ## Graph 3: Distribution of Topics
     st.header('Topic Distribution')
     st.markdown('This plot displays distribution of reviews over the topics for the sentiment selected.')
     generate_sentiment_frequency(data)
 
-    ## Graph 3
-    st.header('Sentiment Distribution')
-    st.markdown('This plot displays percentage and count distribution of sentiments over the years as selected.')
-    sentiment_distribution(data)
+    ## Graph 4: Word Plot
+    st.header('Word Distribution per Topic')
+    st.markdown('This plot displays the top N words in the selected topic of interest. Larger the word size in the word plot, the more frequently the word appears in the reviews under this topic. ')
+    # Generate the word plot
+    generate_wordplot(data)
 
-    ## Graph 4
-    st.header('Topics Over the Years')
+    ## Graph 5
+    st.header('Trends in Topics over the Years')
     st.markdown('This plot displays the distribution of topics over the months of selected year(s)')
     topics_over_time(data)
 
+
 if __name__ == '__main__':
-    main()
+    # Define and parse command-line arguments
+    parser = argparse.ArgumentParser(description="Process a CSV file for analysis.")
+    parser.add_argument("file_path", type=str, help="Path to CSV file.")
+    args = parser.parse_args()
+
+    # Call the main function with the file path argument
+    main(args.file_path)
