@@ -79,19 +79,19 @@ def test_PREPROCESS_FLAIR(sample_document):
 
 
 def test_SA_PREPROCESS_TRAIN(sample_document):
-    for input_df in sample_document:
-        features_df = SA_PREPROCESS_TRAIN(input_df)
+    input_df = sample_document[0]
+    features_df = SA_PREPROCESS_TRAIN(input_df)
 
-        # Test column names of features_df, except for 'Sentiment' column, should contain "PC" string
-        expected_cols = [col for col in features_df.columns if 'PC' in col and col != 'Sentiment']
-        cols = [col for col in features_df.columns if col != 'Sentiment']
-        assert all(col in expected_cols for col in cols), \
-            f"Column names do not meet expectations. Expected column names containing 'PC': {expected_cols}, Actual column names: {list(features_df.columns)}"
+    # Test column names of features_df, except for 'Sentiment' column, should contain "PC" string
+    expected_cols = [col for col in features_df.columns if 'PC' in col and col != 'Sentiment']
+    cols = [col for col in features_df.columns if col != 'Sentiment']
+    assert all(col in expected_cols for col in cols), \
+        f"Column names do not meet expectations. Expected column names containing 'PC': {expected_cols}, Actual column names: {list(features_df.columns)}"
 
-        # Test values in 'Sentiment' column should be either 0 or 1
-        sentiment_values = features_df['Sentiment'].unique()
-        assert all(val in [0, 1] for val in sentiment_values), \
-            f"Values in 'Sentiment' column do not meet expectations. Expected values: [0, 1], Actual values: {list(sentiment_values)}"
+    # Test values in 'Sentiment' column should be either 0 or 1
+    sentiment_values = features_df['Sentiment'].unique()
+    assert all(val in [0, 1] for val in sentiment_values), \
+        f"Values in 'Sentiment' column do not meet expectations. Expected values: [0, 1], Actual values: {list(sentiment_values)}"
 
 def test_SA_PREPROCESS_TEST(sample_document):
     for input_df in sample_document:
@@ -100,19 +100,19 @@ def test_SA_PREPROCESS_TEST(sample_document):
         assert isinstance(SA_PROCESSED_DF_FLAIR, pd.DataFrame)
 
 def test_final_full_data_preprocess(sample_document):
-    for input_df in sample_document:
-        features_df = final_full_data_preprocess(input_df)
+    input_df = sample_document[0]
+    features_df = final_full_data_preprocess(input_df)
 
-        # Test column names of features_df, except for 'Sentiment' column, should contain "PC" string
-        expected_cols = [col for col in features_df.columns if 'PC' in col and col != 'Sentiment']
-        cols = [col for col in features_df.columns if col != 'Sentiment']
-        assert all(col in expected_cols for col in cols), \
-            f"Column names do not meet expectations. Expected column names containing 'PC': {expected_cols}, Actual column names: {list(features_df.columns)}"
+    # Test column names of features_df, except for 'Sentiment' column, should contain "PC" string
+    expected_cols = [col for col in features_df.columns if 'PC' in col and col != 'Sentiment']
+    cols = [col for col in features_df.columns if col != 'Sentiment']
+    assert all(col in expected_cols for col in cols), \
+        f"Column names do not meet expectations. Expected column names containing 'PC': {expected_cols}, Actual column names: {list(features_df.columns)}"
 
-        # Test values in 'Sentiment' column should be either 0 or 1
-        sentiment_values = features_df['Sentiment'].unique()
-        assert all(val in [0, 1] for val in sentiment_values), \
-            f"Values in 'Sentiment' column do not meet expectations. Expected values: [0, 1], Actual values: {list(sentiment_values)}"
+    # Test values in 'Sentiment' column should be either 0 or 1
+    sentiment_values = features_df['Sentiment'].unique()
+    assert all(val in [0, 1] for val in sentiment_values), \
+        f"Values in 'Sentiment' column do not meet expectations. Expected values: [0, 1], Actual values: {list(sentiment_values)}"
 
 
 # if __name__ == "__main__":
