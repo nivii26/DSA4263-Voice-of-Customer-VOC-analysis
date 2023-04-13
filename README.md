@@ -45,7 +45,9 @@ To load the visualisation locally, ensure that the packages streamlit and Circli
 
 Run the following command in the terminal to access the dashboard through a local host.
 
-```streamlit run root/src/visualization/visualize.py path_to_file_to_visualize``` 
+```
+streamlit run root/src/visualization/visualize.py path_to_file_to_visualize
+``` 
 
 Alternatively, view ['this repository'](https://github.com/nivii26/VoC-streamlit-app)
 
