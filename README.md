@@ -47,4 +47,4 @@ Run the following command in the terminal to access the dashboard through a loca
 
 ```streamlit run root/src/visualization/visualize.py path_to_file_to_visualize``` 
 
-Alternatively, view (this repository)[https://github.com/nivii26/VoC-streamlit-app]
+Alternatively, view ['this repository'](https://github.com/nivii26/VoC-streamlit-app)
