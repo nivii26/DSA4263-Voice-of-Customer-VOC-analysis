@@ -33,13 +33,13 @@ Some usage examples can be found in the [api_demo notebook](https://https://gith
 
 ## Task Breakdown
 
-TASK 1 : Sentiment Analysis
+### TASK 1 : Sentiment Analysis
 
-TASK 2 : Topic Modeling
+### TASK 2 : Topic Modeling
 
 To train the topic model from outside of the root directory, run: ```python -m root.src.model.tm.tm_train```. This will train and deposit a topic model into root/models/tm/. Configuration of the training hyperparameters is specified in root/src/model/tm/config.yml.
 
-TASK 3 : Visualisation
+### TASK 3 : Visualization
 
 To load the visualisation locally, ensure that the packages streamlit and Circlify (in the requirements.txt) are already installed. 
 
@@ -48,3 +48,5 @@ Run the following command in the terminal to access the dashboard through a loca
 ```streamlit run root/src/visualization/visualize.py path_to_file_to_visualize``` 
 
 Alternatively, view ['this repository'](https://github.com/nivii26/VoC-streamlit-app)
+
+Click ['here'](https://share.streamlit.io/app/nivii26-voc-streamlit-app-visualize-9xla2m/) to access a demo_dashboard
