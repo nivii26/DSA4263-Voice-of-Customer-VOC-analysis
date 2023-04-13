@@ -50,16 +50,17 @@ async def predict_upload_csv(file: fastapi.UploadFile = fastapi.File(...)):
         fileReadBuffer = BytesIO(content)
         master_df = zip_preprocess(fileReadBuffer, expected_columns)
         if set(master_df.columns) != expected_columns:
-            raise "Unexpected columns in DataFrame. Expected: {expected_columns}. Actual: {set(master_df.columns)}"
+            raise f"Unexpected columns in DataFrame. Expected: {expected_columns}. Actual: {set(master_df.columns)}"
     elif file.filename.endswith(".csv"):
     #elif file.content_type in ["text/csv", "application/csv"]:
         master_df = pd.read_csv(file.file)
         if set(master_df.columns) != expected_columns:
-            raise "Unexpected columns in DataFrame. Expected: {expected_columns}. Actual: {set(master_df.columns)}"
+            raise f"Unexpected columns in DataFrame. Expected: {expected_columns}. Actual: {set(master_df.columns)}"
     else:
         raise HTTPException(status_code=400, detail="Only Zip and CSV files are allowed")
     sa_pred, tm_pred = generate_predictions(master_df, CURRENT_TIME)
-    sa_result_pred = sa_pred.loc[:,["Time", "Text", "Sentiment", "avg_prob"]]
+    sa_result_pred = sa_pred.loc[:,["Time", "Text", "avg_prob", "Sentiment"]]
+    sa_result_pred.rename(columns={"avg_prob":"predicted_sentiment_probability", "Sentiment":"predicted_sentiment"})
     tm_result_pred = tm_pred.loc[:,["Time", "Text", "Sentiment", "Predicted Topic"]]
     dfs = [("SA_RESULT.csv", sa_result_pred), ("TM_RESULT.csv", tm_result_pred)]
     inMemoryBuffer = BytesIO()
@@ -116,7 +117,3 @@ async def get_tm_predictions(CURRENT_TIME: int):
     if CURRENT_TIME:
         return Response(retrieve_tm_pred(CURRENT_TIME).to_json(orient="records"), media_type="application/json")
     return None
-
-@app.get("/api/visualiation")
-async def get_tableau(CURRENT_TIME):
-    pass

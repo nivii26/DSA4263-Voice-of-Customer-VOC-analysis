@@ -15,7 +15,7 @@ def zip_preprocess(zip_file, expected_columns):
 
     Output: 1 DataFrame with columns ["Date", "Text"] created using all relevant csv files in the zipfile
     """
-    masterdf = pd.DataFrame(columns=expected_columns)
+    masterdf = pd.DataFrame(columns=list(expected_columns))
     with zipfile.ZipFile(zip_file, 'r') as zip_ref:
         for file in zip_ref.namelist():
             if file.endswith("csv"):
@@ -119,24 +119,6 @@ def request_raw_data(url, id):
         return response.content
     else:
         print("Error!", response.text)
-
-# def request_data_report(url, id):
-#     endpoint = "data_report"
-#     url = f"{url}/{endpoint}"
-#     response  = requests.post(url, data={"CURRENT_TIME":{id}})
-#     if response.status_code == 200:
-#         return response.content
-#     else:
-#         print("Error!", response.text)
-
-# def request_cleaned_data(url, id):
-#     endpoint = "cleaned_data"
-#     url = f"{url}/{endpoint}"
-#     response  = requests.post(url, data={"CURRENT_TIME":{id}})
-#     if response.status_code == 200:
-#         return response.content
-#     else:
-#         print("Error!", response.text)
     
 def request_sa_pred_data(url, id):
     endpoint = "sa_pred"
@@ -155,5 +137,23 @@ def request_tm_pred_data(url, id):
         return response.content
     else:
         print("Error!", response.text)
+
+# def request_data_report(url, id):
+#     endpoint = "data_report"
+#     url = f"{url}/{endpoint}"
+#     response  = requests.post(url, data={"CURRENT_TIME":{id}})
+#     if response.status_code == 200:
+#         return response.content
+#     else:
+#         print("Error!", response.text)
+
+# def request_cleaned_data(url, id):
+#     endpoint = "cleaned_data"
+#     url = f"{url}/{endpoint}"
+#     response  = requests.post(url, data={"CURRENT_TIME":{id}})
+#     if response.status_code == 200:
+#         return response.content
+#     else:
+#         print("Error!", response.text)
 
 
