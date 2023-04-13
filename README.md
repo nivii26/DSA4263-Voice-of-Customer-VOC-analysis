@@ -41,3 +41,4 @@ To train the topic model from outside of the root directory, run: ```python -m r
 
 TASK 3 : Visualisation
 
+To load the visualisation locally, ensure that the packages streamlit and Circlify (in the requirements.txt) are already installed. Run ```streamlit run root/src/visualization/visualize.py``` in the terminal. If successful, the visualisation will be opened in the defualt browser.
