@@ -117,7 +117,7 @@ Topic modelling's preprocessing continues from raw data preprocessing by perform
 **Training**: 
 We considered the following topic models: LDA, NMF, LSA. Our final topic model was decided using both quantitative and qualitative evaluation. 
 
-- Quantitative: We experimented with hyperparameters such as the word embedding method and the number of topics to find the top ranking topic models based on CV coherence. 
+- Quantitative: We experimented with hyperparameters such as the word embedding method and the number of topics to find the top ranking topic models based on CV coherence. Number of topics used ranged from 5 to 15.
 - Qualitative: From among the top performing models, we selected the configuration for our final model by picking the model that generated topics which seemed to best represent the general content of the entire corpus. This selection was purely manual.
  
 The configuration for the training hyperparameters of the final model is specified in [config.yml file](https://github.com/nivii26/DSA4263-Voice-of-Customer-VOC-analysis/tree/main/root/src/model/tm/config.yml). To train the topic model, run: 
