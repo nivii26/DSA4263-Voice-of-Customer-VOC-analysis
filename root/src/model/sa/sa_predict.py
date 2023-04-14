@@ -149,7 +149,7 @@ def scoring(test_df):
     SA_PREDICTIONS_DF.rename(columns={"avg_prob":"predicted_sentiment_probability", "Sentiment":"predicted_sentiment"}, inplace=True)
 
     # Save/return results
-    SA_PREDICTIONS_DF.to_csv("root/data/predict/reviews_test_predictions_CAJN.csv", index = False)
+    SA_PREDICTIONS_DF.to_csv("root/data/output/reviews_test_predictions_CAJN.csv", index = False)
 
     return SA_PREDICTIONS_DF
 
