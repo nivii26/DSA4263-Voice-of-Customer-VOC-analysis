@@ -69,10 +69,9 @@ def batch_predict(corpus: List[List[tuple]], model) -> List[List[tuple]]:
 def extract_topic(row: List[Tuple[str, float]]) -> str:
     """Get top topic for each review
     Parameters:
-        row: a row of data from a dataframe
+        row (List[Tuple[str, float]]): Each row of data from a dataframe
     Returns:
         (str): A string that contains the main topic that the review is about 
-    
     """
     topics = row['Predicted Topic']
     max_topic = max(topics, key=lambda x: x[1])
@@ -95,17 +94,3 @@ def TM_MODEL_PREDICT(tm_df: pd.DataFrame) -> pd.DataFrame:
     tm_df["Predicted Topic"] = batch_predictions
     tm_df['Main Topic'] = tm_df.apply(extract_topic, axis=1)
     return tm_df.drop("processed_text", axis=1)
-"""
-
-if __name__ == "__main__":
-
-
-    from ast import literal_eval
-    df = pd.read_csv(
-        str(ROOT_DIR / "src" / "data" / "tm" / "20230410221742_CLEANED_DF.csv"),
-        nrows=30,
-    )
-    # print(df)
-    df["processed_text"] = df["Text"].apply(lambda x: literal_eval(x))
-    print(TM_MODEL_PREDICT(df))
-"""
