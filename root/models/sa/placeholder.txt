@@ -1,1 +1,1 @@
-All the models we experimented with Sentiment Analysis are saved here.
+Please obtain the zip files of the SA models from any of the contributors to this repo. 
