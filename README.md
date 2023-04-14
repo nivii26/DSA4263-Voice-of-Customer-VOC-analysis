@@ -75,6 +75,7 @@ To run the preprocessing step run -
 ```bash
 python root/src/preprocessing/sa_preprocessing.py root/data/raw/sample_RAW_DF_train.csv
 ```
+Note: Modify 2nd argument, to be the path to a raw dataframe with columns ['Time', 'Sentiment', 'Text']
 
 **Training**: We experiment with several classification models such as the Naive Baye's Classifier, Logistic Regression, SVM (Support Vector Machine), XGBoost and pretrained models like Vader and Falir. View the table below for relative perfromace of these models on the test data (from train-test split) and our inference -
 Performance Comparision Table
@@ -103,6 +104,7 @@ To obtain predictions, run -
 ```bash
 python root/src/model/sa/sa_predict.py root/data/raw/sample_RAW_DF.csv
 ```
+Note: Modify 2nd argument, to be the path to a raw dataframe with columns ['Time', 'Text']
 
 ### TASK 2 : Topic Modeling
 
