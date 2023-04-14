@@ -122,7 +122,7 @@ The configuration for the training hyperparameters of the final model is specifi
 ```
 python -m root.src.model.tm.tm_train
 ```
-This will train and deposit a topic model into root/models/tm/.
+This will train and deposit the chosen topic model into root/models/tm/.
 
 ### TASK 3 : Visualization
 
