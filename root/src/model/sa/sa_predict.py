@@ -10,6 +10,8 @@ from flair.nn import Classifier
 from flair.data import Sentence
 import joblib
 
+from ...preprocessing.sa_preprocessing import SA_PREPROCESS_TEST
+
 
 def svm_predict(test_data_svm, mode):
     '''
