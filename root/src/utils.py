@@ -66,8 +66,29 @@ def generate_predictions(RAW_DF, CURRENT_TIME, SAVE=True):
 
 # Retrieving results
 def retrieve_raw_data(CURRENT_TIME):
+    """
+    Support function to retreieve the raw data from local data folder when raw data endpoint is called
+    """ 
     if f"{CURRENT_TIME}_RAW_DF.csv" in os.listdir(r"./root/data/raw"):
         data = pd.read_csv(fr"./root/data/raw/{CURRENT_TIME}_RAW_DF.csv")
+        return data
+    return None
+
+def retrieve_sa_pred(CURRENT_TIME):
+    """
+    Support function to retreieve the SA prediction data from local data folder when raw data endpoint is called
+    """ 
+    if f"{CURRENT_TIME}_SA_PRED_DF.csv" in os.listdir(r"./root/src/data/sa"):
+        data = pd.read_csv(fr"./root/src/data/sa/{CURRENT_TIME}_SA_PRED_DF.csv")
+        return data
+    return None
+
+def retrieve_tm_pred(CURRENT_TIME):
+    """
+    Support function to retreieve the TM prediction data from local data folder when raw data endpoint is called
+    """ 
+    if f"{CURRENT_TIME}_TM_PRED_DF.csv" in os.listdir(r"./root/src/data/tm"):
+        data = pd.read_csv(fr"./root/src/data/tm/{CURRENT_TIME}_TM_PRED_DF.csv")
         return data
     return None
 
@@ -83,20 +104,19 @@ def retrieve_raw_data(CURRENT_TIME):
 #         return path
 #     return None
 
-def retrieve_sa_pred(CURRENT_TIME):
-    if f"{CURRENT_TIME}_SA_PRED_DF.csv" in os.listdir(r"./root/src/data/sa"):
-        data = pd.read_csv(fr"./root/src/data/sa/{CURRENT_TIME}_SA_PRED_DF.csv")
-        return data
-    return None
-
-def retrieve_tm_pred(CURRENT_TIME):
-    if f"{CURRENT_TIME}_TM_PRED_DF.csv" in os.listdir(r"./root/src/data/tm"):
-        data = pd.read_csv(fr"./root/src/data/tm/{CURRENT_TIME}_TM_PRED_DF.csv")
-        return data
-    return None
-
 # Access Endpoints
 def predict_file(url, dir, fname):
+    """
+    Function to make a post request to the predict endpoint
+
+    Input: 
+    1. url of the website homepage
+    2. dir: directory of the file you are predicting
+    3. fname: filename of the file 
+
+    Output:
+    1. Zip file containing the SA and TM prediction saved in your directory
+    """
     endpoint = "predict"
     url = f"{url}/{endpoint}"
     file = open(f"{dir}/{fname}", "rb")
@@ -112,27 +132,57 @@ def predict_file(url, dir, fname):
     file.close()
 
 def request_raw_data(url, id):
+    """
+    Function to make a get request to the raw_data endpoint
+
+    Input: 
+    1. url of the website homepage
+    2. id: CURRENT_TIME when the predict function was called
+
+    Output:
+    1. JSON formatted content of the raw data file
+    """
     endpoint = "raw_data"
     url = f"{url}/{endpoint}"
-    response  = requests.post(url, data={"CURRENT_TIME":{id}})
+    response  = requests.get(url, params={"CURRENT_TIME":{id}})
     if response.status_code == 200:
         return response.content
     else:
         print("Error!", response.text)
     
 def request_sa_pred_data(url, id):
+    """
+    Function to make a get request to the SA_PRED endpoint
+
+    Input: 
+    1. url of the website homepage
+    2. id: CURRENT_TIME when the predict function was called
+
+    Output:
+    1. JSON formatted content of the SA_PRED data file
+    """
     endpoint = "sa_pred"
     url = f"{url}/{endpoint}"
-    response  = requests.post(url, data={"CURRENT_TIME":{id}})
+    response  = requests.get(url, params={"CURRENT_TIME":{id}})
     if response.status_code == 200:
         return response.content
     else:
         print("Error!", response.text)
 
 def request_tm_pred_data(url, id):
+    """
+    Function to make a get request to the TM_PRED endpoint
+
+    Input: 
+    1. url of the website homepage
+    2. id: CURRENT_TIME when the predict function was called
+
+    Output:
+    1. JSON formatted content of the TM_PRED data file
+    """
     endpoint = "tm_pred"
     url = f"{url}/{endpoint}"
-    response  = requests.post(url, data={"CURRENT_TIME":{id}})
+    response  = requests.get(url, params={"CURRENT_TIME":{id}})
     if response.status_code == 200:
         return response.content
     else:
@@ -141,7 +191,7 @@ def request_tm_pred_data(url, id):
 # def request_data_report(url, id):
 #     endpoint = "data_report"
 #     url = f"{url}/{endpoint}"
-#     response  = requests.post(url, data={"CURRENT_TIME":{id}})
+#     response  = requests.get(url, params={"CURRENT_TIME":{id}})
 #     if response.status_code == 200:
 #         return response.content
 #     else:
@@ -150,7 +200,7 @@ def request_tm_pred_data(url, id):
 # def request_cleaned_data(url, id):
 #     endpoint = "cleaned_data"
 #     url = f"{url}/{endpoint}"
-#     response  = requests.post(url, data={"CURRENT_TIME":{id}})
+#     response  = requests.get(url, params={"CURRENT_TIME":{id}})
 #     if response.status_code == 200:
 #         return response.content
 #     else:

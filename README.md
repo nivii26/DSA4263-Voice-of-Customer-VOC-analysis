@@ -14,8 +14,14 @@ Run
 docker build -t api .
 ```  
 
+For MAC/Linux:
 ```
-docker run -d -p 5000:5000 api
+docker run -d -p 5000:5000 -v ${pwd}:/app api
+```
+
+For Windows:
+```
+docker run -d -p 5000:5000 -v ${PWD}:/app api
 ```
 
 2. **Virtual Environment**
@@ -47,21 +53,23 @@ The app is hosted on -
 
 ![image](./root/src/assets/swagger.jpg)
 
-Some usage examples can be found in the [api_demo notebook](https://github.com/nivii26/DSA4263-Voice-of-Customer-VOC-analysis/blob/main/root/ipynb/api_demo.ipynb)
+Usage example can be found in the [api_demo notebook](https://github.com/nivii26/DSA4263-Voice-of-Customer-VOC-analysis/blob/main/root/ipynb/api_demo.ipynb)
 
 ## Task Breakdown
 
 ### TASK 1 : Sentiment Analysis
+
 View this notebook ['sentiment_analysis_demo'](https://github.com/nivii26/DSA4263-Voice-of-Customer-VOC-analysis/blob/main/root/ipynb/sentiment_analysis_demo.ipynb) for a step-by-step demo of this subtask.
 
 **Preprocessing**: Our preprocessing methodology for Sentiment Classification is to generate word embeddings for the 'Text' column in reviews.csv by concatinating the embeddings generated from Word2vec and TF-IDF (Term Frequency - Inverse Document Frequency). We then apply PCA (Principal Component Analysis) to reduce the dimensionality of the embedding space. This step can help to speed up the subsequent analysis while still retaining the important features of the text.
 
-To run the preprocessing step run - 
+To run the preprocessing step run -
+
 ```
 TO DO 
 ```
 
-**Training**: We experiment with several classification models such as the Naive Baye's Classifier, Logistic Regression, SVM (Support Vector Machine), XGBoost and pretrained models like Vader and Falir. View the table below for relative perfromace of these models on the test data (from train-test split) and our inference - 
+**Training**: We experiment with several classification models such as the Naive Baye's Classifier, Logistic Regression, SVM (Support Vector Machine), XGBoost and pretrained models like Vader and Falir. View the table below for relative perfromace of these models on the test data (from train-test split) and our inference -
 Performance Comparision Table
 
 |    Model             |    Weighted F1 (train)    |       Weighted F1 (Test)| PR_AUC (TRAIN) | PR_AUC (TEST) |  Evaluation|
@@ -75,14 +83,16 @@ Performance Comparision Table
 
 The two best perfroming models were Non-Linear SVM and Flair based on the above metrics of 'weighted F1 score' and 'PR-AUC'. Hence our, final model is an ensemble of these two models based on aggregration (average).
 
-To train new data using our methodology, run - 
+To train new data using our methodology, run -
+
 ```
 TO DO 
 ```
 
 **Predict**: The prediction method takes a preprocessed DataFrame (fot SVM) and original cleaned up text (for the model 'Flair') as input. The output is a DataFrame with the the sentiment_labels and probabilities from the two individual models and the final_sentiment and final_probability from the ensembling process, which are our final sentiment predictions.
 
-To obtain predictions, run - 
+To obtain predictions, run -
+
 ```
 TO DO 
 ```
