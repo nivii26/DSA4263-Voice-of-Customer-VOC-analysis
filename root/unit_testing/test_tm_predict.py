@@ -54,5 +54,5 @@ def test_batch_predict(sample_documents):
 
 def test_tm_model_predict(sample_documents):
     df_pred = TM_MODEL_PREDICT(sample_documents)
-    assert df_pred.columns.tolist() == ["Sentiment", "Time", "Text", "Predicted Topic"]
-    assert df_pred.shape == (2, 4)
+    assert df_pred.columns.tolist() == ["Sentiment", "Time", "Text", "Predicted Topic", "Main Topic"]
+    assert df_pred.shape == (2, 5)

@@ -74,12 +74,30 @@ async def predict_upload_csv(file: fastapi.UploadFile = fastapi.File(...)):
     return response
 
 @app.get("/api/raw_data")
-async def get_raw_data(CURRENT_TIME: int):
+async def get_raw_data(CURRENT_TIME):
     """
     Endpoint to look at the raw_data submitted in JSON format
     """
     if CURRENT_TIME:
         return Response(retrieve_raw_data(CURRENT_TIME).to_json(orient="records"), media_type="application/json")
+    return None
+
+@app.get("/api/sa_pred")
+async def get_semantic_predictions(CURRENT_TIME):
+    """
+    Endpoint to look at the predictions by the SA model 
+    """
+    if CURRENT_TIME:
+        return Response(retrieve_sa_pred(CURRENT_TIME).to_json(orient="records"), media_type="application/json")
+    return None
+
+@app.get("/api/tm_pred")
+async def get_tm_predictions(CURRENT_TIME):
+    """
+    Endpoint to look at the predictions by the TM model
+    """
+    if CURRENT_TIME:
+        return Response(retrieve_tm_pred(CURRENT_TIME).to_json(orient="records"), media_type="application/json")
     return None
 
 # @app.get("/api/data_report")
@@ -99,21 +117,3 @@ async def get_raw_data(CURRENT_TIME: int):
 #     if CURRENT_TIME:
 #         return Response(retrieve_cleaned_data(CURRENT_TIME).to_json(orient="records"), media_type="application/json")
 #     return None
-
-@app.get("/api/sa_pred")
-async def get_semantic_predictions(CURRENT_TIME: int):
-    """
-    Endpoint to look at the predictions by the SA model 
-    """
-    if CURRENT_TIME:
-        return Response(retrieve_sa_pred(CURRENT_TIME).to_json(orient="records"), media_type="application/json")
-    return None
-
-@app.get("/api/tm_pred")
-async def get_tm_predictions(CURRENT_TIME: int):
-    """
-    Endpoint to look at the predictions by the TM model
-    """
-    if CURRENT_TIME:
-        return Response(retrieve_tm_pred(CURRENT_TIME).to_json(orient="records"), media_type="application/json")
-    return None
