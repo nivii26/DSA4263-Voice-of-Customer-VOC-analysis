@@ -71,7 +71,7 @@ View this notebook ['sentiment_analysis_demo'](https://github.com/nivii26/DSA426
 
 **Preprocessing**: Our preprocessing methodology for Sentiment Classification is to generate word embeddings for the 'Text' column in reviews.csv by concatinating the embeddings generated from Word2vec and TF-IDF (Term Frequency - Inverse Document Frequency). We then apply PCA (Principal Component Analysis) to reduce the dimensionality of the embedding space. This step can help to speed up the subsequent analysis while still retaining the important features of the text.
 
-To run the preprocessing step run -
+To run the preprocessing step run - (This will create a file with embeddings file at root/src/data/sa/features_train_sa.csv)
 
 ```bash
 python root/src/preprocessing/sa_preprocessing.py root/data/raw/sample_RAW_DF_train.csv
@@ -111,7 +111,7 @@ Note: Modify 2nd argument, to be the path to a raw dataframe with columns ['Time
 
 View this notebook ['topic_modelling'](https://github.com/nivii26/DSA4263-Voice-of-Customer-VOC-analysis/blob/main/root/ipynb/topic_modelling.ipynb) for a step-by-step demo of this subtask.
 
-**Preprocessing**: Run topic modelling specific preprocessing. (This will create a file with embeddings root/src/data/sa/file features_train_sa.csv)
+**Preprocessing**: Run topic modelling specific preprocessing.
 ```
 python root/src/preprocessing/tm_preprocessing.py
 ```
