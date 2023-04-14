@@ -59,6 +59,11 @@ Usage example can be found in the [api_demo notebook](https://github.com/nivii26
 
 ## Task Breakdown
 
+Before executing any of the code in the following tasks, run the code for general preprocessing:
+```
+python root/src/preprocessing/rawdata_preprocessing.py
+```
+
 ### TASK 1 : Sentiment Analysis
 
 View this notebook ['sentiment_analysis_demo'](https://github.com/nivii26/DSA4263-Voice-of-Customer-VOC-analysis/blob/main/root/ipynb/sentiment_analysis_demo.ipynb) for a step-by-step demo of this subtask.
@@ -101,7 +106,23 @@ python root/src/model/sa/sa_predict.py root/data/raw/sample_RAW_DF.csv
 
 ### TASK 2 : Topic Modeling
 
-To train the topic model from outside of the root directory, run: ```python -m root.src.model.tm.tm_train```. This will train and deposit a topic model into root/models/tm/. Configuration of the training hyperparameters is specified in [config.yml file](https://https://github.com/nivii26/DSA4263-Voice-of-Customer-VOC-analysis/tree/main/root/src/model/tm/config.yml).
+**Preprocessing**: Run topic modelling specific preprocessing. 
+```
+python root/src/preprocessing/tm_preprocessing.py
+```
+Topic modelling's preprocessing continues from raw data preprocessing by performing some light cleaning and lemmatisation.
+
+**Training**: 
+We considered the following topic models: LDA, NMF, LSA. Our final topic model was decided using both quantitative and qualitative evaluation. 
+
+- Quantitative: We experimented with hyperparameters such as the word embedding method and the number of topics to find the top ranking topic models based on CV coherence. 
+- Qualitative: From among the top performing models, we selected the configuration for our final model by picking the model that generated topics which seemed to best represent the general content of the entire corpus. This selection was purely manual.
+ 
+The configuration for the training hyperparameters of the final model is specified in [config.yml file](https://github.com/nivii26/DSA4263-Voice-of-Customer-VOC-analysis/tree/main/root/src/model/tm/config.yml). To train the topic model, run: 
+```
+python -m root.src.model.tm.tm_train
+```
+This will train and deposit a topic model into root/models/tm/.
 
 ### TASK 3 : Visualization
 
