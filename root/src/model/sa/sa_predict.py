@@ -128,23 +128,41 @@ def SA_MODEL_PREDICT(SA_PROCESSED_DF_SVM, SA_PROCESSED_DF_FLAIR, mode):
     results['Text'] = np.array(text)
     return results # results['Sentiment'] is the final predicted sentiment (positive/negative)
 
+
 def scoring(test_df):
     '''
     inputs : DataFrame with 'Time' and 'Text'
     output :  dataframe["Text", Time", "predicted_sentiment_probability", "predicted_sentiment"]
     function: Apply preprocessing and fit final model to output final_sentiment and predicted sentiment_probability
     '''
+
+
     # SA Preprocessing
     SA_PROCESSED_DF_SVM, SA_PROCESSED_DF_FLAIR = SA_PREPROCESS_TEST(test_df)
 
     # SA Predictions
     SA_PREDICTIONS_DF = SA_MODEL_PREDICT(SA_PROCESSED_DF_SVM, SA_PROCESSED_DF_FLAIR, "predict")
     SA_PREDICTIONS_DF = SA_PREDICTIONS_DF[["Time", "Text", "avg_prob", "Sentiment"]]
-  
+   
+    
     # Rename columns to desired outputs
     SA_PREDICTIONS_DF.rename(columns={"avg_prob":"predicted_sentiment_probability", "Sentiment":"predicted_sentiment"}, inplace=True)
 
     # Save/return results
-    SA_PREDICTIONS_DF.to_csv("reviews_test_predictions_CAJN.csv", index = False)
+    SA_PREDICTIONS_DF.to_csv("root/data/predict/reviews_test_predictions_CAJN.csv", index = False)
 
     return SA_PREDICTIONS_DF
+
+def main(file_path):
+    data = pd.read_csv(file_path)
+    scoring(data)
+
+
+if __name__ == '__main__':
+    # Define and parse command-line arguments
+    parser = argparse.ArgumentParser(description="Process a CSV file for analysis.")
+    parser.add_argument("file_path", type=str, help="Path to CSV file.")
+    args = parser.parse_args()
+
+    # Call the main function with the file path argument
+    main(args.file_path)
