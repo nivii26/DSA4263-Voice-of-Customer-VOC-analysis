@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>root.src.model.tm.tm_train &mdash; VOC 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../_static/doctools.js"></script>
+        <script src="../../../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            VOC
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../modules.html">root</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">VOC</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">root.src.model.tm.tm_train</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for root.src.model.tm.tm_train</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Contains functions related to training topic models&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+<span class="kn">from</span> <span class="nn">gensim.models</span> <span class="kn">import</span> <span class="n">LdaModel</span><span class="p">,</span> <span class="n">Nmf</span><span class="p">,</span> <span class="n">LsiModel</span><span class="p">,</span> <span class="n">CoherenceModel</span>
+<span class="kn">from</span> <span class="nn">gensim</span> <span class="kn">import</span> <span class="n">corpora</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">.core</span> <span class="kn">import</span> <span class="n">MODEL_DIR</span><span class="p">,</span> <span class="n">CONFIG</span>
+
+
+<div class="viewcode-block" id="build_gensim_model"><a class="viewcode-back" href="../../../../../root.src.model.tm.html#root.src.model.tm.tm_train.build_gensim_model">[docs]</a><span class="k">def</span> <span class="nf">build_gensim_model</span><span class="p">(</span>
+    <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">corpus</span><span class="p">:</span> <span class="n">corpora</span><span class="o">.</span><span class="n">MmCorpus</span><span class="p">,</span>
+    <span class="n">id2word</span><span class="p">:</span> <span class="n">corpora</span><span class="o">.</span><span class="n">Dictionary</span><span class="p">,</span>
+    <span class="n">num_topics</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a model from gensim</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        model_name (string): Name of model to build. lda or nmf or lsa.</span>
+<span class="sd">        corpus (gensim corpus): Bag of words based corpus</span>
+<span class="sd">        id2word (gensim dictionary object): gensim dict, contains word mappings</span>
+<span class="sd">        num_topics (int): Number of topics</span>
+<span class="sd">        random_state (int): Random seed</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (gensim model): trained gensim model</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">model_name</span> <span class="o">==</span> <span class="s2">&quot;lda&quot;</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">LdaModel</span><span class="p">(</span>
+            <span class="n">id2word</span><span class="o">=</span><span class="n">id2word</span><span class="p">,</span>
+            <span class="n">corpus</span><span class="o">=</span><span class="n">corpus</span><span class="p">,</span>
+            <span class="n">num_topics</span><span class="o">=</span><span class="n">num_topics</span><span class="p">,</span>
+            <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">model_name</span> <span class="o">==</span> <span class="s2">&quot;nmf&quot;</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">Nmf</span><span class="p">(</span>
+            <span class="n">id2word</span><span class="o">=</span><span class="n">id2word</span><span class="p">,</span>
+            <span class="n">corpus</span><span class="o">=</span><span class="n">corpus</span><span class="p">,</span>
+            <span class="n">num_topics</span><span class="o">=</span><span class="n">num_topics</span><span class="p">,</span>
+            <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">model_name</span> <span class="o">==</span> <span class="s2">&quot;lsa&quot;</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">LsiModel</span><span class="p">(</span>
+            <span class="n">id2word</span><span class="o">=</span><span class="n">id2word</span><span class="p">,</span>
+            <span class="n">corpus</span><span class="o">=</span><span class="n">corpus</span><span class="p">,</span>
+            <span class="n">num_topics</span><span class="o">=</span><span class="n">num_topics</span><span class="p">,</span>
+            <span class="n">random_seed</span><span class="o">=</span><span class="n">random_state</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Model name should be one of lda, nmf, lsa!&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">model</span></div>
+
+
+<div class="viewcode-block" id="compute_coherence_score"><a class="viewcode-back" href="../../../../../root.src.model.tm.html#root.src.model.tm.tm_train.compute_coherence_score">[docs]</a><span class="k">def</span> <span class="nf">compute_coherence_score</span><span class="p">(</span>
+    <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">corpus</span><span class="p">:</span> <span class="n">corpora</span><span class="o">.</span><span class="n">MmCorpus</span><span class="p">,</span>
+    <span class="n">id2word</span><span class="p">:</span> <span class="n">corpora</span><span class="o">.</span><span class="n">Dictionary</span><span class="p">,</span>
+    <span class="n">lemma_text</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+    <span class="n">num_topics</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">coherence_metric</span><span class="o">=</span><span class="s2">&quot;c_v&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a gensim model and evaluate coherence</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        model_name (string): Name of model to used. lda or nmf or lsa.</span>
+<span class="sd">        corpus (gensim corpus object): Bag of words based corpus</span>
+<span class="sd">        id2word (gensim dictionary object): gensim dict, contains word mappings</span>
+<span class="sd">        lemma_text (list): List containing lists of all the lemmatised words per sample</span>
+<span class="sd">        num_topics (int): Number of topics</span>
+<span class="sd">        random_state (int): Random seed</span>
+<span class="sd">        coherence_metric (string): A gensim coherence metric</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (int): coherence score</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">build_gensim_model</span><span class="p">(</span>
+        <span class="n">model_name</span><span class="p">,</span> <span class="n">corpus</span><span class="p">,</span> <span class="n">id2word</span><span class="p">,</span> <span class="n">num_topics</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span>
+    <span class="p">)</span>
+
+    <span class="n">coherence_model_lda</span> <span class="o">=</span> <span class="n">CoherenceModel</span><span class="p">(</span>
+        <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">texts</span><span class="o">=</span><span class="n">lemma_text</span><span class="p">,</span> <span class="n">dictionary</span><span class="o">=</span><span class="n">id2word</span><span class="p">,</span> <span class="n">coherence</span><span class="o">=</span><span class="n">coherence_metric</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">coherence_model_lda</span><span class="o">.</span><span class="n">get_coherence</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="evaluate_topic_models"><a class="viewcode-back" href="../../../../../root.src.model.tm.html#root.src.model.tm.tm_train.evaluate_topic_models">[docs]</a><span class="k">def</span> <span class="nf">evaluate_topic_models</span><span class="p">(</span>
+    <span class="n">model_name</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">corpuses</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="n">id2word</span><span class="p">:</span> <span class="n">corpora</span><span class="o">.</span><span class="n">Dictionary</span><span class="p">,</span>
+    <span class="n">lemma_text</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+    <span class="n">num_topics</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Run different gensim algorithms with different corpus inputs</span>
+<span class="sd">    and number of topics.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    model_name (list): Collection of different algorithm names from gensim</span>
+<span class="sd">    corpuses (dictionary): Key - &#39;bow&#39; or &#39;tfidf&#39;. Value - gensim corpus object</span>
+<span class="sd">    id2word (gensim dictionary object): gensim dict, contains word mappings</span>
+<span class="sd">    lemma_text (list): List containing lists of all the lemmatised words per sample</span>
+<span class="sd">    num_topics (list): Range of number of topics to try topic modelling with</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (pd.DataFrame) Dataframe with coherence score for each corpus + num_topic combination</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># collect results here</span>
+    <span class="n">select_algo_results</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;model name&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;corpus&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;num topic&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;score&quot;</span><span class="p">:</span> <span class="p">[]}</span>
+
+    <span class="n">pbar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">corpuses</span><span class="p">)</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">num_topics</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">model_name</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">corpus_type</span><span class="p">,</span> <span class="n">corpus</span> <span class="ow">in</span> <span class="n">corpuses</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">num_topics</span><span class="p">:</span>
+                <span class="n">score</span> <span class="o">=</span> <span class="n">compute_coherence_score</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">corpus</span><span class="p">,</span> <span class="n">id2word</span><span class="p">,</span> <span class="n">lemma_text</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+
+                <span class="c1"># add model results to dataframe</span>
+                <span class="n">select_algo_results</span><span class="p">[</span><span class="s2">&quot;model name&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                <span class="n">select_algo_results</span><span class="p">[</span><span class="s2">&quot;corpus&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">corpus_type</span><span class="p">)</span>
+                <span class="n">select_algo_results</span><span class="p">[</span><span class="s2">&quot;num topic&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                <span class="n">select_algo_results</span><span class="p">[</span><span class="s2">&quot;score&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">score</span><span class="p">)</span>
+
+                <span class="c1"># update progress bar</span>
+                <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">pbar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">select_algo_results</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="train_and_persist_tm"><a class="viewcode-back" href="../../../../../root.src.model.tm.html#root.src.model.tm.tm_train.train_and_persist_tm">[docs]</a><span class="k">def</span> <span class="nf">train_and_persist_tm</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Train the selected topic model&quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">CONFIG</span><span class="p">[</span><span class="s2">&quot;preprocess_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;bow&quot;</span><span class="p">:</span>
+        <span class="n">corpus</span> <span class="o">=</span> <span class="n">corpora</span><span class="o">.</span><span class="n">MmCorpus</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">MODEL_DIR</span> <span class="o">/</span> <span class="n">CONFIG</span><span class="p">[</span><span class="s2">&quot;bow_corpus_file&quot;</span><span class="p">]))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">corpus</span> <span class="o">=</span> <span class="n">corpora</span><span class="o">.</span><span class="n">MmCorpus</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">MODEL_DIR</span> <span class="o">/</span> <span class="n">CONFIG</span><span class="p">[</span><span class="s2">&quot;tfidf_corpus_file&quot;</span><span class="p">]))</span>
+    <span class="n">id2word</span> <span class="o">=</span> <span class="n">corpora</span><span class="o">.</span><span class="n">Dictionary</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">MODEL_DIR</span> <span class="o">/</span> <span class="n">CONFIG</span><span class="p">[</span><span class="s2">&quot;id2word_file&quot;</span><span class="p">]))</span>
+    <span class="n">num_topics</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">CONFIG</span><span class="p">[</span><span class="s2">&quot;num_topics&quot;</span><span class="p">])</span>
+    <span class="n">model_name</span> <span class="o">=</span> <span class="n">CONFIG</span><span class="p">[</span><span class="s2">&quot;model_name&quot;</span><span class="p">]</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">build_gensim_model</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">corpus</span><span class="p">,</span> <span class="n">id2word</span><span class="p">,</span> <span class="n">num_topics</span><span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">MODEL_DIR</span> <span class="o">/</span> <span class="s2">&quot;tm_model&quot;</span><span class="p">))</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">train_and_persist_tm</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, CAJN.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

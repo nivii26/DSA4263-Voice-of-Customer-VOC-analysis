@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>root.src.model.tm package &mdash; VOC 1.0.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="root.src.preprocessing package" href="root.src.preprocessing.html" />
+    <link rel="prev" title="root.src.model.sa package" href="root.src.model.sa.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            VOC
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">root</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="root.html">root package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="root.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="root.src.html">root.src package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="root.unit_testing.html">root.unit_testing package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="root.html#module-root">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">VOC</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">root</a></li>
+          <li class="breadcrumb-item"><a href="root.html">root package</a></li>
+          <li class="breadcrumb-item"><a href="root.src.html">root.src package</a></li>
+          <li class="breadcrumb-item"><a href="root.src.model.html">root.src.model package</a></li>
+      <li class="breadcrumb-item active">root.src.model.tm package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/root.src.model.tm.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="root-src-model-tm-package">
+<h1>root.src.model.tm package<a class="headerlink" href="#root-src-model-tm-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-root.src.model.tm.core">
+<span id="root-src-model-tm-core-module"></span><h2>root.src.model.tm.core module<a class="headerlink" href="#module-root.src.model.tm.core" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="root.src.model.tm.core.fetch_config_from_yaml">
+<span class="sig-prename descclassname"><span class="pre">root.src.model.tm.core.</span></span><span class="sig-name descname"><span class="pre">fetch_config_from_yaml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'config.yml'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/root/src/model/tm/core.html#fetch_config_from_yaml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#root.src.model.tm.core.fetch_config_from_yaml" title="Permalink to this definition"></a></dt>
+<dd><p>Parse YAML containing the package configuration.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="root.src.model.tm.core.parse_yaml">
+<span class="sig-prename descclassname"><span class="pre">root.src.model.tm.core.</span></span><span class="sig-name descname"><span class="pre">parse_yaml</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/root/src/model/tm/core.html#parse_yaml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#root.src.model.tm.core.parse_yaml" title="Permalink to this definition"></a></dt>
+<dd><p>Constrain values from yaml</p>
+</dd></dl>
+
+</section>
+<section id="module-root.src.model.tm.tm_predict">
+<span id="root-src-model-tm-tm-predict-module"></span><h2>root.src.model.tm.tm_predict module<a class="headerlink" href="#module-root.src.model.tm.tm_predict" title="Permalink to this heading"></a></h2>
+<p>Functions relevant to making a prediction</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="root.src.model.tm.tm_predict.TM_MODEL_PREDICT">
+<span class="sig-prename descclassname"><span class="pre">root.src.model.tm.tm_predict.</span></span><span class="sig-name descname"><span class="pre">TM_MODEL_PREDICT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tm_df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/root/src/model/tm/tm_predict.html#TM_MODEL_PREDICT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#root.src.model.tm.tm_predict.TM_MODEL_PREDICT" title="Permalink to this definition"></a></dt>
+<dd><p>Load persisted model -&gt; apply preprocessing methods -&gt; predict</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tm_df</strong> (<em>pandas dataframe</em>) – Each value in ‘processed_text’ column should be a list of tokens</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>tm_df appended with ‘Predicted Topic’</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tm_df (pandas dataframe)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="root.src.model.tm.tm_predict.batch_predict">
+<span class="sig-prename descclassname"><span class="pre">root.src.model.tm.tm_predict.</span></span><span class="sig-name descname"><span class="pre">batch_predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">corpus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/root/src/model/tm/tm_predict.html#batch_predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#root.src.model.tm.tm_predict.batch_predict" title="Permalink to this definition"></a></dt>
+<dd><p>Make batch prediction
+:param corpus: Each embedded list within is in the form [(word id, importance), (word id, importance) …]
+:type corpus: list
+:param model: Either lda, nmf, lsa
+:type model: gensim model object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Each embedded list contains tuples of form (topic label, proba)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>(list)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="root.src.model.tm.tm_predict.extract_topic">
+<span class="sig-prename descclassname"><span class="pre">root.src.model.tm.tm_predict.</span></span><span class="sig-name descname"><span class="pre">extract_topic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">row</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/root/src/model/tm/tm_predict.html#extract_topic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#root.src.model.tm.tm_predict.extract_topic" title="Permalink to this definition"></a></dt>
+<dd><p>Get top topic for each review
+:param row: Each row of data from a dataframe
+:type row: List[Tuple[str, float]]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A string that contains the main topic that the review is about</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>(str)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="root.src.model.tm.tm_predict.load_model">
+<span class="sig-prename descclassname"><span class="pre">root.src.model.tm.tm_predict.</span></span><span class="sig-name descname"><span class="pre">load_model</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/root/src/model/tm/tm_predict.html#load_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#root.src.model.tm.tm_predict.load_model" title="Permalink to this definition"></a></dt>
+<dd><p>Load persisted model object</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="root.src.model.tm.tm_predict.predict">
+<span class="sig-prename descclassname"><span class="pre">root.src.model.tm.tm_predict.</span></span><span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bow_document</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/root/src/model/tm/tm_predict.html#predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#root.src.model.tm.tm_predict.predict" title="Permalink to this definition"></a></dt>
+<dd><p>Get topic model predictions
+:param bow_document: A document in the form of [(word id, importance), (word id, importance) …]
+:type bow_document: list
+:param model: Either lda, nmf, lsa
+:type model: gensim model object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Each embedded tuple is of the form (topic label, proba)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>mapped_pred (list)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="root.src.model.tm.tm_predict.preprocess">
+<span class="sig-prename descclassname"><span class="pre">root.src.model.tm.tm_predict.</span></span><span class="sig-name descname"><span class="pre">preprocess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_of_text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/root/src/model/tm/tm_predict.html#preprocess"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#root.src.model.tm.tm_predict.preprocess" title="Permalink to this definition"></a></dt>
+<dd><p>Conducts bow preprocessing on a list of text
+:param list_of_text: Each embedded list is a document
+:type list_of_text: list</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Each embedded list contains tuples in the form (word id, embedded value)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>corpus (list)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-root.src.model.tm.tm_train">
+<span id="root-src-model-tm-tm-train-module"></span><h2>root.src.model.tm.tm_train module<a class="headerlink" href="#module-root.src.model.tm.tm_train" title="Permalink to this heading"></a></h2>
+<p>Contains functions related to training topic models</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="root.src.model.tm.tm_train.build_gensim_model">
+<span class="sig-prename descclassname"><span class="pre">root.src.model.tm.tm_train.</span></span><span class="sig-name descname"><span class="pre">build_gensim_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corpus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MmCorpus</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id2word</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dictionary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_topics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/root/src/model/tm/tm_train.html#build_gensim_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#root.src.model.tm.tm_train.build_gensim_model" title="Permalink to this definition"></a></dt>
+<dd><p>Build a model from gensim</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model_name</strong> (<em>string</em>) – Name of model to build. lda or nmf or lsa.</p></li>
+<li><p><strong>corpus</strong> (<em>gensim corpus</em>) – Bag of words based corpus</p></li>
+<li><p><strong>id2word</strong> (<em>gensim dictionary object</em>) – gensim dict, contains word mappings</p></li>
+<li><p><strong>num_topics</strong> (<em>int</em>) – Number of topics</p></li>
+<li><p><strong>random_state</strong> (<em>int</em>) – Random seed</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>trained gensim model</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(gensim model)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="root.src.model.tm.tm_train.compute_coherence_score">
+<span class="sig-prename descclassname"><span class="pre">root.src.model.tm.tm_train.</span></span><span class="sig-name descname"><span class="pre">compute_coherence_score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corpus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MmCorpus</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id2word</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dictionary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lemma_text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_topics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coherence_metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'c_v'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/root/src/model/tm/tm_train.html#compute_coherence_score"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#root.src.model.tm.tm_train.compute_coherence_score" title="Permalink to this definition"></a></dt>
+<dd><p>Build a gensim model and evaluate coherence</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model_name</strong> (<em>string</em>) – Name of model to used. lda or nmf or lsa.</p></li>
+<li><p><strong>corpus</strong> (<em>gensim corpus object</em>) – Bag of words based corpus</p></li>
+<li><p><strong>id2word</strong> (<em>gensim dictionary object</em>) – gensim dict, contains word mappings</p></li>
+<li><p><strong>lemma_text</strong> (<em>list</em>) – List containing lists of all the lemmatised words per sample</p></li>
+<li><p><strong>num_topics</strong> (<em>int</em>) – Number of topics</p></li>
+<li><p><strong>random_state</strong> (<em>int</em>) – Random seed</p></li>
+<li><p><strong>coherence_metric</strong> (<em>string</em>) – A gensim coherence metric</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>coherence score</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(int)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="root.src.model.tm.tm_train.evaluate_topic_models">
+<span class="sig-prename descclassname"><span class="pre">root.src.model.tm.tm_train.</span></span><span class="sig-name descname"><span class="pre">evaluate_topic_models</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corpuses</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id2word</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dictionary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lemma_text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_topics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/root/src/model/tm/tm_train.html#evaluate_topic_models"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#root.src.model.tm.tm_train.evaluate_topic_models" title="Permalink to this definition"></a></dt>
+<dd><p>Run different gensim algorithms with different corpus inputs
+and number of topics.</p>
+<p>Parameters:
+model_name (list): Collection of different algorithm names from gensim
+corpuses (dictionary): Key - ‘bow’ or ‘tfidf’. Value - gensim corpus object
+id2word (gensim dictionary object): gensim dict, contains word mappings
+lemma_text (list): List containing lists of all the lemmatised words per sample
+num_topics (list): Range of number of topics to try topic modelling with</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(pd.DataFrame) Dataframe with coherence score for each corpus + num_topic combination</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="root.src.model.tm.tm_train.train_and_persist_tm">
+<span class="sig-prename descclassname"><span class="pre">root.src.model.tm.tm_train.</span></span><span class="sig-name descname"><span class="pre">train_and_persist_tm</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/root/src/model/tm/tm_train.html#train_and_persist_tm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#root.src.model.tm.tm_train.train_and_persist_tm" title="Permalink to this definition"></a></dt>
+<dd><p>Train the selected topic model</p>
+</dd></dl>
+
+</section>
+<section id="module-root.src.model.tm">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-root.src.model.tm" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="root.src.model.sa.html" class="btn btn-neutral float-left" title="root.src.model.sa package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="root.src.preprocessing.html" class="btn btn-neutral float-right" title="root.src.preprocessing package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, CAJN.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

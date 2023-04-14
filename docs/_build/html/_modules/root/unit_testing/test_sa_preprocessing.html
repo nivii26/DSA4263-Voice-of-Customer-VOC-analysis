@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>root.unit_testing.test_sa_preprocessing &mdash; VOC 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            VOC
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">root</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">VOC</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">root.unit_testing.test_sa_preprocessing</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for root.unit_testing.test_sa_preprocessing</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pytest</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">..src.preprocessing.rawdata_preprocessing</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">..src.preprocessing.sa_preprocessing</span> <span class="kn">import</span> <span class="o">*</span>
+
+
+<div class="viewcode-block" id="test_augment_train"><a class="viewcode-back" href="../../../root.unit_testing.html#root.unit_testing.test_sa_preprocessing.test_augment_train">[docs]</a><span class="k">def</span> <span class="nf">test_augment_train</span><span class="p">():</span>
+    <span class="c1"># create a sample dataframe</span>
+    <span class="n">train_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+        <span class="s1">&#39;Text&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;I love this movie&#39;</span><span class="p">,</span> <span class="s1">&#39;This movie is terrible&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;Sentiment&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;positive&#39;</span><span class="p">,</span> <span class="s1">&#39;negative&#39;</span><span class="p">]</span>
+    <span class="p">})</span>
+    <span class="c1"># augment the data</span>
+    <span class="n">augmented_data</span> <span class="o">=</span> <span class="n">augment_train</span><span class="p">(</span><span class="n">train_data</span><span class="p">)</span>
+    <span class="c1"># check if the augmented dataframe has more rows than the original</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">augmented_data</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_data</span><span class="p">)</span>
+    <span class="c1"># check if the augmented dataframe has the same number of positive examples</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">augmented_data</span><span class="p">[</span><span class="n">augmented_data</span><span class="p">[</span><span class="s1">&#39;Sentiment&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;positive&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_data</span><span class="p">[</span><span class="n">train_data</span><span class="p">[</span><span class="s1">&#39;Sentiment&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;positive&#39;</span><span class="p">])</span>
+    <span class="c1"># check if the augmented dataframe has more negative examples</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">augmented_data</span><span class="p">[</span><span class="n">augmented_data</span><span class="p">[</span><span class="s1">&#39;Sentiment&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;negative&#39;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_data</span><span class="p">[</span><span class="n">train_data</span><span class="p">[</span><span class="s1">&#39;Sentiment&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;negative&#39;</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="test_sa_preprocess"><a class="viewcode-back" href="../../../root.unit_testing.html#root.unit_testing.test_sa_preprocessing.test_sa_preprocess">[docs]</a><span class="k">def</span> <span class="nf">test_sa_preprocess</span><span class="p">():</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;Here are some words for sample.&quot;</span>
+    <span class="n">expected_tokens</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Here&#39;</span><span class="p">,</span>  <span class="s1">&#39;word&#39;</span><span class="p">,</span> <span class="s1">&#39;sample&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">]</span>
+    <span class="c1">## remove stop words: are, some, for</span>
+    <span class="c1">## lemma: words-&gt;word</span>
+    <span class="k">assert</span> <span class="n">sa_preprocess</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="o">==</span> <span class="n">expected_tokens</span></div>
+
+<div class="viewcode-block" id="sample_document"><a class="viewcode-back" href="../../../root.unit_testing.html#root.unit_testing.test_sa_preprocessing.sample_document">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
+<span class="k">def</span> <span class="nf">sample_document</span><span class="p">():</span>
+    <span class="n">input_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;./root/unit_testing/testcase/input/test_sa_input.csv&quot;</span><span class="p">)</span>
+    <span class="n">input_df2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;./root/unit_testing/testcase/input/test_sa_input2.csv&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">input_df</span><span class="p">,</span> <span class="n">input_df2</span></div>
+
+<div class="viewcode-block" id="test_PREPROCESS_XGB"><a class="viewcode-back" href="../../../root.unit_testing.html#root.unit_testing.test_sa_preprocessing.test_PREPROCESS_XGB">[docs]</a><span class="k">def</span> <span class="nf">test_PREPROCESS_XGB</span><span class="p">(</span><span class="n">sample_document</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">input_df</span> <span class="ow">in</span> <span class="n">sample_document</span><span class="p">:</span>
+        <span class="n">features_df</span> <span class="o">=</span> <span class="n">PREPROCESS_XGB</span><span class="p">(</span><span class="n">input_df</span><span class="p">)</span>
+
+        <span class="c1"># Test column names of features_df, except for &#39;Sentiment&#39; column, should contain &quot;PC&quot; string</span>
+        <span class="n">expected_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">features_df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="s1">&#39;PC&#39;</span> <span class="ow">in</span> <span class="n">col</span> <span class="ow">and</span> <span class="n">col</span> <span class="o">!=</span> <span class="s1">&#39;Sentiment&#39;</span><span class="p">]</span>
+        <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">features_df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">col</span> <span class="o">!=</span> <span class="s1">&#39;Sentiment&#39;</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">col</span> <span class="ow">in</span> <span class="n">expected_cols</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">),</span> \
+            <span class="sa">f</span><span class="s2">&quot;Column names do not meet expectations. Expected column names containing &#39;PC&#39;: </span><span class="si">{</span><span class="n">expected_cols</span><span class="si">}</span><span class="s2">, Actual column names: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">features_df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="c1"># Test if &#39;Sentiment&#39; column, if present, contains only 0 or 1 values</span>
+        <span class="k">if</span> <span class="s1">&#39;Sentiment&#39;</span> <span class="ow">in</span> <span class="n">features_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">sentiment_values</span> <span class="o">=</span> <span class="n">features_df</span><span class="p">[</span><span class="s1">&#39;Sentiment&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+            <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">val</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">sentiment_values</span><span class="p">),</span> \
+                <span class="sa">f</span><span class="s2">&quot;Values in &#39;Sentiment&#39; column do not meet expectations. Expected values: [0, 1], Actual values: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">sentiment_values</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="c1"># Test the number of rows in features_df should be the same as input_df</span>
+        <span class="n">expected_row_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_df</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">features_df</span><span class="p">)</span> <span class="o">==</span> <span class="n">expected_row_count</span><span class="p">,</span> \
+            <span class="sa">f</span><span class="s2">&quot;Number of rows does not meet expectations. Expected row count: </span><span class="si">{</span><span class="n">expected_row_count</span><span class="si">}</span><span class="s2">, Actual row co0unt: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">features_df</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="test_PREPROCESS_FLAIR"><a class="viewcode-back" href="../../../root.unit_testing.html#root.unit_testing.test_sa_preprocessing.test_PREPROCESS_FLAIR">[docs]</a><span class="k">def</span> <span class="nf">test_PREPROCESS_FLAIR</span><span class="p">(</span><span class="n">sample_document</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">input_df</span> <span class="ow">in</span> <span class="n">sample_document</span><span class="p">:</span>
+        <span class="n">cleaned_df</span> <span class="o">=</span> <span class="n">PREPROCESS_FLAIR</span><span class="p">(</span><span class="n">input_df</span><span class="p">)</span>
+
+        <span class="c1"># Test if &#39;Time&#39; and &#39;Text&#39; columns are present in cleaned_df </span>
+        <span class="n">expected_cols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Time&#39;</span><span class="p">,</span> <span class="s1">&#39;Text&#39;</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">col</span> <span class="ow">in</span> <span class="n">cleaned_df</span><span class="o">.</span><span class="n">columns</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">expected_cols</span><span class="p">),</span> \
+            <span class="sa">f</span><span class="s2">&quot;Expected columns: </span><span class="si">{</span><span class="n">expected_cols</span><span class="si">}</span><span class="s2">, Actual columns: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">cleaned_df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        
+        <span class="c1"># Test if &#39;Sentiment&#39; column, if present, contains only 0 or 1 values</span>
+        <span class="k">if</span> <span class="s1">&#39;Sentiment&#39;</span> <span class="ow">in</span> <span class="n">cleaned_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">sentiment_values</span> <span class="o">=</span> <span class="n">cleaned_df</span><span class="p">[</span><span class="s1">&#39;Sentiment&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+            <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">val</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">sentiment_values</span><span class="p">),</span> \
+                <span class="sa">f</span><span class="s2">&quot;Values in &#39;Sentiment&#39; column do not meet expectations. Expected values: [0, 1], Actual values: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">sentiment_values</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="c1"># Test if the number of rows in cleaned_df is the same as input_df</span>
+        <span class="n">expected_row_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_df</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">cleaned_df</span><span class="p">)</span> <span class="o">==</span> <span class="n">expected_row_count</span><span class="p">,</span> \
+            <span class="sa">f</span><span class="s2">&quot;Number of rows does not meet expectations. Expected row count: </span><span class="si">{</span><span class="n">expected_row_count</span><span class="si">}</span><span class="s2">, Actual row count: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">cleaned_df</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span></div>
+
+
+<div class="viewcode-block" id="test_SA_PREPROCESS_TRAIN"><a class="viewcode-back" href="../../../root.unit_testing.html#root.unit_testing.test_sa_preprocessing.test_SA_PREPROCESS_TRAIN">[docs]</a><span class="k">def</span> <span class="nf">test_SA_PREPROCESS_TRAIN</span><span class="p">(</span><span class="n">sample_document</span><span class="p">):</span>
+    <span class="n">input_df</span> <span class="o">=</span> <span class="n">sample_document</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">features_df</span> <span class="o">=</span> <span class="n">SA_PREPROCESS_TRAIN</span><span class="p">(</span><span class="n">input_df</span><span class="p">)</span>
+
+    <span class="c1"># Test column names of features_df, except for &#39;Sentiment&#39; column, should contain &quot;PC&quot; string</span>
+    <span class="n">expected_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">features_df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="s1">&#39;PC&#39;</span> <span class="ow">in</span> <span class="n">col</span> <span class="ow">and</span> <span class="n">col</span> <span class="o">!=</span> <span class="s1">&#39;Sentiment&#39;</span><span class="p">]</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">features_df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">col</span> <span class="o">!=</span> <span class="s1">&#39;Sentiment&#39;</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">col</span> <span class="ow">in</span> <span class="n">expected_cols</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">),</span> \
+        <span class="sa">f</span><span class="s2">&quot;Column names do not meet expectations. Expected column names containing &#39;PC&#39;: </span><span class="si">{</span><span class="n">expected_cols</span><span class="si">}</span><span class="s2">, Actual column names: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">features_df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="c1"># Test values in &#39;Sentiment&#39; column should be either 0 or 1</span>
+    <span class="n">sentiment_values</span> <span class="o">=</span> <span class="n">features_df</span><span class="p">[</span><span class="s1">&#39;Sentiment&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">val</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">sentiment_values</span><span class="p">),</span> \
+        <span class="sa">f</span><span class="s2">&quot;Values in &#39;Sentiment&#39; column do not meet expectations. Expected values: [0, 1], Actual values: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">sentiment_values</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span></div>
+
+<div class="viewcode-block" id="test_SA_PREPROCESS_TEST"><a class="viewcode-back" href="../../../root.unit_testing.html#root.unit_testing.test_sa_preprocessing.test_SA_PREPROCESS_TEST">[docs]</a><span class="k">def</span> <span class="nf">test_SA_PREPROCESS_TEST</span><span class="p">(</span><span class="n">sample_document</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">input_df</span> <span class="ow">in</span> <span class="n">sample_document</span><span class="p">:</span>
+        <span class="n">SA_PROCESSED_DF_XGB</span><span class="p">,</span> <span class="n">SA_PROCESSED_DF_FLAIR</span> <span class="o">=</span> <span class="n">SA_PREPROCESS_TEST</span><span class="p">(</span><span class="n">input_df</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">SA_PROCESSED_DF_XGB</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">SA_PROCESSED_DF_FLAIR</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="test_final_full_data_preprocess"><a class="viewcode-back" href="../../../root.unit_testing.html#root.unit_testing.test_sa_preprocessing.test_final_full_data_preprocess">[docs]</a><span class="k">def</span> <span class="nf">test_final_full_data_preprocess</span><span class="p">(</span><span class="n">sample_document</span><span class="p">):</span>
+    <span class="n">input_df</span> <span class="o">=</span> <span class="n">sample_document</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">features_df</span> <span class="o">=</span> <span class="n">final_full_data_preprocess</span><span class="p">(</span><span class="n">input_df</span><span class="p">)</span>
+
+    <span class="c1"># Test column names of features_df, except for &#39;Sentiment&#39; column, should contain &quot;PC&quot; string</span>
+    <span class="n">expected_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">features_df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="s1">&#39;PC&#39;</span> <span class="ow">in</span> <span class="n">col</span> <span class="ow">and</span> <span class="n">col</span> <span class="o">!=</span> <span class="s1">&#39;Sentiment&#39;</span><span class="p">]</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">features_df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">col</span> <span class="o">!=</span> <span class="s1">&#39;Sentiment&#39;</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">col</span> <span class="ow">in</span> <span class="n">expected_cols</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">),</span> \
+        <span class="sa">f</span><span class="s2">&quot;Column names do not meet expectations. Expected column names containing &#39;PC&#39;: </span><span class="si">{</span><span class="n">expected_cols</span><span class="si">}</span><span class="s2">, Actual column names: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">features_df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="c1"># Test values in &#39;Sentiment&#39; column should be either 0 or 1</span>
+    <span class="n">sentiment_values</span> <span class="o">=</span> <span class="n">features_df</span><span class="p">[</span><span class="s1">&#39;Sentiment&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">val</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">sentiment_values</span><span class="p">),</span> \
+        <span class="sa">f</span><span class="s2">&quot;Values in &#39;Sentiment&#39; column do not meet expectations. Expected values: [0, 1], Actual values: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">sentiment_values</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span></div>
+
+
+<span class="c1"># if __name__ == &quot;__main__&quot;:</span>
+<span class="c1">#     input_df = pd.read_csv(r&quot;root/unit_testing/testcase/input/test_sa_input.csv&quot;)</span>
+<span class="c1">#     input_df2 = pd.read_csv(r&quot;root/unit_testing/testcase/input/test_sa_input2.csv&quot;)</span>
+    
+<span class="c1">#     # Test data with sentiment column</span>
+<span class="c1">#     test_augment_train()</span>
+<span class="c1">#     test_sa_preprocess()</span>
+<span class="c1">#     test_PREPROCESS_FLAIR(input_df)</span>
+<span class="c1">#     test_SA_PREPROCESS_TEST(input_df)</span>
+<span class="c1">#     xgb_df = PREPROCESS_RAW(input_df)</span>
+<span class="c1">#     test_PREPROCESS_XGB(xgb_df.copy())</span>
+<span class="c1">#     test_SA_PREPROCESS_TRAIN(xgb_df.copy())</span>
+<span class="c1">#     test_final_full_data_preprocess(xgb_df.copy())</span>
+
+<span class="c1">#     # Test data without sentiment column</span>
+<span class="c1">#     test_PREPROCESS_FLAIR(input_df2)</span>
+<span class="c1">#     test_SA_PREPROCESS_TEST(input_df2)</span>
+<span class="c1">#     xgb_df2 = PREPROCESS_RAW(input_df2)</span>
+<span class="c1">#     test_PREPROCESS_XGB(xgb_df2.copy())</span>
+<span class="c1">#     print(&quot;All Tests Passed&quot;)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, CAJN.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

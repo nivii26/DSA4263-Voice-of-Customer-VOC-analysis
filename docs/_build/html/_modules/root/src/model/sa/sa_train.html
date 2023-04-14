@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>root.src.model.sa.sa_train &mdash; VOC 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../_static/doctools.js"></script>
+        <script src="../../../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            VOC
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../modules.html">root</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">VOC</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">root.src.model.sa.sa_train</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for root.src.model.sa.sa_train</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Basic requirements</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="c1"># Train - test split</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+
+<span class="c1"># For XGBoost</span>
+<span class="kn">from</span> <span class="nn">xgboost</span> <span class="kn">import</span> <span class="n">XGBClassifier</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">uniform</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">RandomizedSearchCV</span>
+
+<span class="c1"># For flair</span>
+<span class="kn">from</span> <span class="nn">flair.nn</span> <span class="kn">import</span> <span class="n">Classifier</span>
+<span class="kn">from</span> <span class="nn">flair.data</span> <span class="kn">import</span> <span class="n">Sentence</span>
+
+<span class="c1"># For metrics</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">confusion_matrix</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">ConfusionMatrixDisplay</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">classification_report</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">accuracy_score</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">f1_score</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">average_precision_score</span>
+<span class="c1">#from sklearn.metrics import make_scorer</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">precision_recall_curve</span>
+<span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">metrics</span>
+
+
+<span class="c1"># For cross validatiion</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">cross_validate</span>
+<span class="c1">#from sklearn.model_selection import cross_val_score,KFold</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">StratifiedKFold</span>
+
+<span class="c1"># For Naive Bayes classifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.naive_bayes</span> <span class="kn">import</span> <span class="n">GaussianNB</span>
+
+<span class="c1"># For logistic regression</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LogisticRegression</span>
+
+<span class="c1"># For non-linear SVM</span>
+<span class="kn">from</span> <span class="nn">sklearn.svm</span> <span class="kn">import</span> <span class="n">NuSVC</span> 
+
+<span class="c1"># For VADER</span>
+<span class="kn">import</span> <span class="nn">nltk</span>
+<span class="c1">#nltk.download(&#39;vader_lexicon&#39;)</span>
+<span class="kn">from</span> <span class="nn">nltk.sentiment.vader</span> <span class="kn">import</span> <span class="n">SentimentIntensityAnalyzer</span>
+
+<span class="c1"># for saving models</span>
+<span class="kn">import</span> <span class="nn">joblib</span>
+
+<div class="viewcode-block" id="sa_train_test_split"><a class="viewcode-back" href="../../../../../root.src.model.sa.html#root.src.model.sa.sa_train.sa_train_test_split">[docs]</a><span class="k">def</span> <span class="nf">sa_train_test_split</span><span class="p">(</span><span class="n">reviews_csv</span><span class="p">):</span> 
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    input : processed reviews_csv DataFrame</span>
+<span class="sd">    output : 2 DataFrames - train_data (70%), test_data(30%)</span>
+<span class="sd">    function : Splits input data into train and test</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="c1"># Specify shuffle = True, to shuffle the data before splitting to avoid bias due to order</span>
+    <span class="c1"># Stratify = sentiment, to ensure train and test have same ratio of postive to negative reviews</span>
+    <span class="n">train_data</span><span class="p">,</span> <span class="n">test_data</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">reviews_csv</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stratify</span><span class="o">=</span><span class="n">reviews_csv</span><span class="p">[</span><span class="s1">&#39;Sentiment&#39;</span><span class="p">],</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">4263</span><span class="p">)</span>
+
+    <span class="n">train_size</span> <span class="o">=</span> <span class="n">train_data</span><span class="p">[</span><span class="s1">&#39;Sentiment&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+    <span class="n">test_size</span> <span class="o">=</span> <span class="n">test_data</span><span class="p">[</span><span class="s1">&#39;Sentiment&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+
+    <span class="n">plotdata</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;positive&quot;</span><span class="p">:[</span><span class="n">train_size</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">test_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+                            <span class="s2">&quot;negative&quot;</span><span class="p">:[</span><span class="n">train_size</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">test_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
+                            <span class="p">},</span> 
+                            <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Train&quot;</span><span class="p">,</span> <span class="s2">&quot;Test&quot;</span><span class="p">])</span>
+
+    <span class="n">plotdata</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span> <span class="o">=</span> <span class="s2">&quot;bar&quot;</span><span class="p">,</span> <span class="n">rot</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;Class Distribution in Train-Test Split&#39;</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">train_data</span><span class="p">,</span> <span class="n">test_data</span></div>
+
+
+
+<div class="viewcode-block" id="evaluate_model_test"><a class="viewcode-back" href="../../../../../root.src.model.sa.html#root.src.model.sa.sa_train.evaluate_model_test">[docs]</a><span class="k">def</span> <span class="nf">evaluate_model_test</span><span class="p">(</span><span class="n">true_sent</span><span class="p">,</span> <span class="n">predicted_sent</span><span class="p">,</span> <span class="n">predicted_prob</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    input : List of true sentiment label, predicted sentiment label, predicted_probability</span>
+<span class="sd">    output : Print classification_report, scores and confusion matrix, pr_auc curve</span>
+<span class="sd">    function : Prints classification_report and evaluation metrics on test data</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;TEST RESULTS&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Classification Report&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">classification_report</span><span class="p">(</span><span class="n">true_sent</span><span class="p">,</span> <span class="n">predicted_sent</span><span class="p">))</span>
+
+    <span class="c1"># Print Score  </span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;PR_AUC score: &quot;</span><span class="p">,</span> <span class="n">average_precision_score</span><span class="p">(</span><span class="n">true_sent</span><span class="p">,</span> <span class="n">predicted_prob</span><span class="p">))</span> <span class="c1"># pos_label=0</span>
+    
+    <span class="c1">## Print Confusion Matrix</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Negative (0)&#39;</span><span class="p">,</span> <span class="s1">&#39;Positive (1)&#39;</span><span class="p">]</span>
+    <span class="n">cm</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">true_sent</span><span class="p">,</span> <span class="n">predicted_sent</span><span class="p">)</span>
+    <span class="n">disp</span> <span class="o">=</span> <span class="n">ConfusionMatrixDisplay</span><span class="p">(</span><span class="n">confusion_matrix</span> <span class="o">=</span> <span class="n">cm</span><span class="p">,</span> <span class="n">display_labels</span> <span class="o">=</span> <span class="n">labels</span><span class="p">)</span>
+    <span class="n">disp</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cmap</span> <span class="o">=</span> <span class="s1">&#39;GnBu&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Confusion Matrix&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+    <span class="c1">## Plot PR_AUC Curve</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">precision</span><span class="p">,</span> <span class="n">recall</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">precision_recall_curve</span><span class="p">(</span><span class="n">true_sent</span><span class="p">,</span> <span class="n">predicted_prob</span><span class="p">)</span>
+
+    <span class="c1"># create precision-recall curve</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">recall</span><span class="p">,</span> <span class="n">precision</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;PR_AUC of Model&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Recall&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Precision&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;PR_AUC Curve&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="train_XGB"><a class="viewcode-back" href="../../../../../root.src.model.sa.html#root.src.model.sa.sa_train.train_XGB">[docs]</a><span class="k">def</span> <span class="nf">train_XGB</span><span class="p">(</span><span class="n">train_data</span><span class="p">,</span> <span class="n">test_data</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    input : 2 DataFrames &#39;train_data&#39; and &#39;test_data&#39;</span>
+<span class="sd">    output : None</span>
+<span class="sd">    function : Fits XGBoost Classifier on the train_data, and saves model. Evaluate performance on test_data</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="c1"># create a default XGBoost classifier</span>
+
+    <span class="n">model</span> <span class="o">=</span> <span class="n">XGBClassifier</span><span class="p">(</span>
+        <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span> 
+    <span class="p">)</span>
+
+    <span class="c1"># Create the grid search parameter grid and scoring funcitons</span>
+    <span class="n">param_grid</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;learning_rate&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">],</span>
+        <span class="s2">&quot;colsample_bytree&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.8</span><span class="p">],</span>
+        <span class="s2">&quot;subsample&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.6</span><span class="p">],</span>
+        <span class="s2">&quot;max_depth&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+        <span class="s2">&quot;n_estimators&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">400</span><span class="p">],</span>
+        <span class="s2">&quot;reg_lambda&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+        <span class="s2">&quot;gamma&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">],</span>
+    <span class="p">}</span>
+    
+    <span class="c1"># Define scoring metrics</span>
+    <span class="n">score_metrics</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;accuracy&#39;</span><span class="p">,</span> <span class="s1">&#39;f1&#39;</span><span class="p">,</span> <span class="s1">&#39;f1_weighted&#39;</span><span class="p">,</span> <span class="s1">&#39;average_precision&#39;</span><span class="p">]</span>
+    
+    <span class="c1"># create the Kfold object</span>
+    <span class="n">num_folds</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">kfold</span> <span class="o">=</span> <span class="n">StratifiedKFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="n">num_folds</span><span class="p">)</span>
+    
+    <span class="c1"># create the grid search object</span>
+    <span class="n">n_iter</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">grid</span> <span class="o">=</span> <span class="n">RandomizedSearchCV</span><span class="p">(</span>
+        <span class="n">estimator</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> 
+        <span class="n">param_distributions</span><span class="o">=</span><span class="n">param_grid</span><span class="p">,</span>
+        <span class="n">cv</span><span class="o">=</span><span class="n">kfold</span><span class="p">,</span>
+        <span class="n">scoring</span><span class="o">=</span><span class="n">score_metrics</span><span class="p">,</span>
+        <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">n_iter</span><span class="o">=</span><span class="n">n_iter</span><span class="p">,</span>
+        <span class="n">refit</span><span class="o">=</span><span class="s1">&#39;f1_weighted&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># fit grid search</span>
+    <span class="n">best_model</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span> <span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">train_data</span><span class="p">[</span><span class="s1">&#39;Sentiment&#39;</span><span class="p">])</span>
+
+    <span class="c1"># Save cross-validation results</span>
+    <span class="n">cv_results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">best_model</span><span class="o">.</span><span class="n">cv_results_</span><span class="p">)</span>
+    
+    <span class="c1"># save model</span>
+    <span class="n">best_model</span><span class="o">.</span><span class="n">best_estimator_</span><span class="o">.</span><span class="n">save_model</span><span class="p">(</span><span class="s2">&quot;root/models/sa/xgb_model.json&quot;</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;CROSS VALIDATION RESULTS XGBoost&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Average Cross Validation score accuracy: &quot;</span><span class="p">,</span> <span class="n">cv_results</span><span class="p">[</span><span class="s1">&#39;mean_test_accuracy&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Average Cross Validation score F1: &quot;</span><span class="p">,</span> <span class="n">cv_results</span><span class="p">[</span><span class="s1">&#39;mean_test_f1&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Average Cross Validation score F1_weighted: &quot;</span><span class="p">,</span> <span class="n">cv_results</span><span class="p">[</span><span class="s1">&#39;mean_test_f1_weighted&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Average Cross Validation score pr_auc: &quot;</span><span class="p">,</span> <span class="n">cv_results</span><span class="p">[</span><span class="s1">&#39;mean_test_average_precision&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+    <span class="c1"># print(best_model.best_estimator_)</span>
+
+    <span class="c1"># Predict on test data</span>
+    <span class="n">xgb_probs</span> <span class="o">=</span> <span class="n">best_model</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">test_data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span> <span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">xgb_sentiment</span> <span class="o">=</span> <span class="n">best_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">test_data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span> <span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">xgb_probs_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">xgb_probs</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;NEGATIVE&#39;</span><span class="p">,</span> <span class="s1">&#39;POSITIVE&#39;</span><span class="p">])</span>
+
+    <span class="c1"># Evalaute goodness of fit of model on test data</span>
+    <span class="n">evaluate_model_test</span><span class="p">(</span><span class="n">test_data</span><span class="p">[</span><span class="s1">&#39;Sentiment&#39;</span><span class="p">],</span> <span class="n">xgb_sentiment</span><span class="p">,</span> <span class="n">xgb_probs_df</span><span class="p">[</span><span class="s1">&#39;POSITIVE&#39;</span><span class="p">])</span></div>
+
+
+
+
+<div class="viewcode-block" id="bayes_classifier"><a class="viewcode-back" href="../../../../../root.src.model.sa.html#root.src.model.sa.sa_train.bayes_classifier">[docs]</a><span class="k">def</span> <span class="nf">bayes_classifier</span><span class="p">(</span><span class="n">train_data</span><span class="p">,</span> <span class="n">test_data</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    input : 2 DataFrames &#39;train_data&#39; and &#39;test_data&#39;</span>
+<span class="sd">    output : None</span>
+<span class="sd">    function : Fits Naive Baye&#39;s Classifier on the train_data. Evaluates performance on test_data</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">NB</span> <span class="o">=</span> <span class="n">GaussianNB</span><span class="p">()</span>
+    <span class="c1"># create the Kfold object</span>
+    <span class="n">kf</span> <span class="o">=</span> <span class="n">StratifiedKFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+
+    <span class="n">score_metrics</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;accuracy&#39;</span><span class="p">,</span> <span class="s1">&#39;f1&#39;</span><span class="p">,</span> <span class="s1">&#39;f1_weighted&#39;</span><span class="p">,</span> <span class="s1">&#39;average_precision&#39;</span><span class="p">]</span>
+    <span class="n">cv_results</span> <span class="o">=</span> <span class="n">cross_validate</span><span class="p">(</span><span class="n">NB</span><span class="p">,</span> <span class="n">train_data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span> <span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">train_data</span><span class="p">[</span><span class="s1">&#39;Sentiment&#39;</span><span class="p">],</span> <span class="n">cv</span> <span class="o">=</span> <span class="n">kf</span><span class="p">,</span> <span class="n">scoring</span> <span class="o">=</span> <span class="n">score_metrics</span><span class="p">)</span>
+    
+    <span class="c1"># Print cross validation scores</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;CROSS VALIDATION RESULTS&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Average Cross Validation score accuracy :</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cv_results</span><span class="p">[</span><span class="s1">&#39;test_accuracy&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Average Cross Validation score F1 :</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cv_results</span><span class="p">[</span><span class="s1">&#39;test_f1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Average Cross Validation score F1_weighted :</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cv_results</span><span class="p">[</span><span class="s1">&#39;test_f1_weighted&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Average Cross Validation score pr_auc :</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cv_results</span><span class="p">[</span><span class="s1">&#39;test_average_precision&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()))</span>
+
+    <span class="c1"># Final fit</span>
+    <span class="n">NB</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span> <span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">train_data</span><span class="p">[</span><span class="s1">&#39;Sentiment&#39;</span><span class="p">])</span>
+
+    <span class="c1"># Predict sentiment labels and probabilities</span>
+    <span class="n">NB_pred_sentiment</span> <span class="o">=</span> <span class="n">NB</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">test_data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span> <span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">NB_pred_prob</span> <span class="o">=</span> <span class="n">NB</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">test_data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span> <span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">NB_pred_prob_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">NB_pred_prob</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;NEGATIVE&#39;</span><span class="p">,</span> <span class="s1">&#39;POSITIVE&#39;</span><span class="p">])</span> 
+
+    <span class="c1"># Evaluate goodness-of-fit of model on test-data</span>
+    <span class="n">evaluate_model_test</span><span class="p">(</span><span class="n">test_data</span><span class="p">[</span><span class="s1">&#39;Sentiment&#39;</span><span class="p">],</span> <span class="n">NB_pred_sentiment</span><span class="p">,</span> <span class="n">NB_pred_prob_df</span><span class="p">[</span><span class="s1">&#39;POSITIVE&#39;</span><span class="p">])</span></div>
+
+
+
+<div class="viewcode-block" id="logistic_regression"><a class="viewcode-back" href="../../../../../root.src.model.sa.html#root.src.model.sa.sa_train.logistic_regression">[docs]</a><span class="k">def</span> <span class="nf">logistic_regression</span><span class="p">(</span><span class="n">train_data</span><span class="p">,</span> <span class="n">test_data</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    input : 2 DataFrames &#39;train_data&#39; and &#39;test_data&#39;</span>
+<span class="sd">    output : None</span>
+<span class="sd">    function : Fits Logistic Regression Model on the train_data. Evaluates performance on test_data</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">logreg</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">()</span>
+    <span class="c1"># create the Kfold object</span>
+    <span class="n">kf</span> <span class="o">=</span> <span class="n">StratifiedKFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+    
+    <span class="n">score_metrics</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;accuracy&#39;</span><span class="p">,</span> <span class="s1">&#39;f1&#39;</span><span class="p">,</span> <span class="s1">&#39;f1_weighted&#39;</span><span class="p">,</span> <span class="s1">&#39;average_precision&#39;</span><span class="p">]</span>
+    <span class="n">cv_results</span> <span class="o">=</span> <span class="n">cross_validate</span><span class="p">(</span><span class="n">logreg</span><span class="p">,</span> <span class="n">train_data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span> <span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">train_data</span><span class="p">[</span><span class="s1">&#39;Sentiment&#39;</span><span class="p">],</span> <span class="n">cv</span> <span class="o">=</span> <span class="n">kf</span><span class="p">,</span> <span class="n">scoring</span> <span class="o">=</span> <span class="n">score_metrics</span><span class="p">)</span>
+    
+    <span class="c1"># Print cross validation scores</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;CROSS VALIDATION RESULTS&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Average Cross Validation score accuracy :</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cv_results</span><span class="p">[</span><span class="s1">&#39;test_accuracy&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Average Cross Validation score F1 :</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cv_results</span><span class="p">[</span><span class="s1">&#39;test_f1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Average Cross Validation score F1_weighted :</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cv_results</span><span class="p">[</span><span class="s1">&#39;test_f1_weighted&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Average Cross Validation score pr_auc :</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cv_results</span><span class="p">[</span><span class="s1">&#39;test_average_precision&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()))</span>
+
+    <span class="c1"># Final fit</span>
+    <span class="n">logreg</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span> <span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">train_data</span><span class="p">[</span><span class="s1">&#39;Sentiment&#39;</span><span class="p">])</span>
+
+    <span class="c1"># Predict sentiment labels and probabilities</span>
+    <span class="n">logreg_pred_sentiment</span> <span class="o">=</span> <span class="n">logreg</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">test_data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span> <span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">logreg_pred_prob</span> <span class="o">=</span> <span class="n">logreg</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">test_data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span> <span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">logreg_pred_prob_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">logreg_pred_prob</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;NEGATIVE&#39;</span><span class="p">,</span> <span class="s1">&#39;POSITIVE&#39;</span><span class="p">])</span> 
+
+    <span class="c1"># Evaluate goodness-of-fit of model on test-data</span>
+    <span class="n">evaluate_model_test</span><span class="p">(</span><span class="n">test_data</span><span class="p">[</span><span class="s1">&#39;Sentiment&#39;</span><span class="p">],</span> <span class="n">logreg_pred_sentiment</span><span class="p">,</span> <span class="n">logreg_pred_prob_df</span><span class="p">[</span><span class="s1">&#39;POSITIVE&#39;</span><span class="p">])</span></div>
+
+
+
+<div class="viewcode-block" id="svc_model"><a class="viewcode-back" href="../../../../../root.src.model.sa.html#root.src.model.sa.sa_train.svc_model">[docs]</a><span class="k">def</span> <span class="nf">svc_model</span><span class="p">(</span><span class="n">train_data</span><span class="p">,</span> <span class="n">test_data</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    input : 2 DataFrames &#39;train_data&#39; and &#39;test_data&#39;</span>
+<span class="sd">    output : None</span>
+<span class="sd">    function : Fits Support Vector Machine (SVM) Classifier on the train_data and saves model. </span>
+<span class="sd">               Evaluates performance on test_data</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">svm</span> <span class="o">=</span> <span class="n">NuSVC</span><span class="p">(</span><span class="n">gamma</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="n">probability</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="c1"># create the Kfold object</span>
+    <span class="n">kf</span> <span class="o">=</span> <span class="n">StratifiedKFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+    
+    <span class="n">score_metrics</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;accuracy&#39;</span><span class="p">,</span> <span class="s1">&#39;f1&#39;</span><span class="p">,</span> <span class="s1">&#39;f1_weighted&#39;</span><span class="p">,</span> <span class="s1">&#39;average_precision&#39;</span><span class="p">]</span>
+    <span class="n">cv_results</span> <span class="o">=</span> <span class="n">cross_validate</span><span class="p">(</span><span class="n">svm</span><span class="p">,</span> <span class="n">train_data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span> <span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">train_data</span><span class="p">[</span><span class="s1">&#39;Sentiment&#39;</span><span class="p">],</span> <span class="n">cv</span> <span class="o">=</span> <span class="n">kf</span><span class="p">,</span> <span class="n">scoring</span> <span class="o">=</span> <span class="n">score_metrics</span><span class="p">)</span>
+    
+    <span class="c1"># Print cross validation scores</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;CROSS VALIDATION RESULTS&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Average Cross Validation score accuracy :</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cv_results</span><span class="p">[</span><span class="s1">&#39;test_accuracy&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Average Cross Validation score F1 :</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cv_results</span><span class="p">[</span><span class="s1">&#39;test_f1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Average Cross Validation score F1_weighted :</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cv_results</span><span class="p">[</span><span class="s1">&#39;test_f1_weighted&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Average Cross Validation score pr_auc :</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cv_results</span><span class="p">[</span><span class="s1">&#39;test_average_precision&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()))</span>
+
+   <span class="c1"># Final fit</span>
+    <span class="n">svm</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span> <span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">train_data</span><span class="p">[</span><span class="s1">&#39;Sentiment&#39;</span><span class="p">])</span>
+
+    <span class="c1"># Save model</span>
+    <span class="n">joblib</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">svm</span><span class="p">,</span> <span class="s1">&#39;root/models/sa/svm_model.pkl&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Predict sentiment labels and probabilities</span>
+    <span class="n">svm_pred_sentiment</span> <span class="o">=</span> <span class="n">svm</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">test_data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span> <span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">svm_pred_prob</span> <span class="o">=</span> <span class="n">svm</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">test_data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span> <span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">svm_pred_prob_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">svm_pred_prob</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;NEGATIVE&#39;</span><span class="p">,</span> <span class="s1">&#39;POSITIVE&#39;</span><span class="p">])</span>
+
+    <span class="c1"># Evaluate goodness-of-fit of model on test-data</span>
+    <span class="n">evaluate_model_test</span><span class="p">(</span><span class="n">test_data</span><span class="p">[</span><span class="s1">&#39;Sentiment&#39;</span><span class="p">],</span> <span class="n">svm_pred_sentiment</span><span class="p">,</span> <span class="n">svm_pred_prob_df</span><span class="p">[</span><span class="s1">&#39;POSITIVE&#39;</span><span class="p">])</span></div>
+
+
+
+
+<div class="viewcode-block" id="vader"><a class="viewcode-back" href="../../../../../root.src.model.sa.html#root.src.model.sa.sa_train.vader">[docs]</a><span class="k">def</span> <span class="nf">vader</span><span class="p">(</span><span class="n">train_data</span><span class="p">,</span> <span class="n">test_data</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    input : 2 DataFrames &#39;train_data&#39; and &#39;test_data&#39;</span>
+<span class="sd">    output : None</span>
+<span class="sd">    function : Evaluates performance of pretrained Vader Model on the train_data and test_data</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">SIA</span> <span class="o">=</span> <span class="n">SentimentIntensityAnalyzer</span><span class="p">()</span>
+
+    <span class="c1"># Performance of Train Data</span>
+    <span class="n">vader_train_results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+    <span class="n">vader_train_results</span><span class="p">[</span><span class="s1">&#39;VADER_dict&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">train_data</span><span class="p">[</span><span class="s1">&#39;Text&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">text</span><span class="p">:</span> <span class="n">SIA</span><span class="o">.</span><span class="n">polarity_scores</span><span class="p">(</span><span class="n">text</span><span class="p">))</span>
+    <span class="n">vader_train_results</span><span class="p">[</span><span class="s1">&#39;VADER_score&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vader_train_results</span><span class="p">[</span><span class="s1">&#39;VADER_dict&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">sent_dict</span><span class="p">:</span> <span class="n">sent_dict</span><span class="p">[</span><span class="s1">&#39;compound&#39;</span><span class="p">])</span>
+    <span class="n">vader_train_results</span><span class="p">[</span><span class="s1">&#39;VADER_label&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># If compound &gt; 0 -&gt; 1 else compund &lt; 0 -&gt; 0</span>
+    <span class="n">vader_train_results</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">vader_train_results</span><span class="p">[</span><span class="s1">&#39;VADER_score&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;VADER_label&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">vader_train_results</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">vader_train_results</span><span class="p">[</span><span class="s1">&#39;VADER_score&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;VADER_label&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">vader_train_results</span><span class="p">[</span><span class="s1">&#39;VADER_prob&#39;</span><span class="p">]</span> <span class="o">=</span>  <span class="n">vader_train_results</span><span class="p">[</span><span class="s1">&#39;VADER_dict&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">sent_dict</span><span class="p">:</span> <span class="n">sent_dict</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">])</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;TRAIN DATA RESULTS&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Train accuracy :</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">accuracy_score</span><span class="p">(</span><span class="n">train_data</span><span class="p">[</span><span class="s1">&#39;Sentiment&#39;</span><span class="p">],</span> <span class="n">vader_train_results</span><span class="p">[</span><span class="s1">&#39;VADER_label&#39;</span><span class="p">])))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Train F1 :</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f1_score</span><span class="p">(</span><span class="n">train_data</span><span class="p">[</span><span class="s1">&#39;Sentiment&#39;</span><span class="p">],</span> <span class="n">vader_train_results</span><span class="p">[</span><span class="s1">&#39;VADER_label&#39;</span><span class="p">])))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Train F1_weighted :</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f1_score</span><span class="p">(</span><span class="n">train_data</span><span class="p">[</span><span class="s1">&#39;Sentiment&#39;</span><span class="p">],</span> <span class="n">vader_train_results</span><span class="p">[</span><span class="s1">&#39;VADER_label&#39;</span><span class="p">],</span> <span class="n">average</span><span class="o">=</span><span class="s1">&#39;weighted&#39;</span><span class="p">)))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Train pr_auc :</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">average_precision_score</span><span class="p">(</span><span class="n">train_data</span><span class="p">[</span><span class="s1">&#39;Sentiment&#39;</span><span class="p">],</span> <span class="n">vader_train_results</span><span class="p">[</span><span class="s1">&#39;VADER_prob&#39;</span><span class="p">])))</span>
+
+    <span class="c1"># Performance of Test Data</span>
+    <span class="n">vader_results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+    <span class="n">vader_results</span><span class="p">[</span><span class="s1">&#39;VADER_dict&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">test_data</span><span class="p">[</span><span class="s1">&#39;Text&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">text</span><span class="p">:</span> <span class="n">SIA</span><span class="o">.</span><span class="n">polarity_scores</span><span class="p">(</span><span class="n">text</span><span class="p">))</span>
+    <span class="n">vader_results</span><span class="p">[</span><span class="s1">&#39;VADER_score&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vader_results</span><span class="p">[</span><span class="s1">&#39;VADER_dict&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">sent_dict</span><span class="p">:</span> <span class="n">sent_dict</span><span class="p">[</span><span class="s1">&#39;compound&#39;</span><span class="p">])</span>
+    <span class="n">vader_results</span><span class="p">[</span><span class="s1">&#39;VADER_label&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># If compound &gt; 0 -&gt; 1 else compund &lt; 0 -&gt; 0</span>
+    <span class="n">vader_results</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">vader_results</span><span class="p">[</span><span class="s1">&#39;VADER_score&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;VADER_label&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">vader_results</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">vader_results</span><span class="p">[</span><span class="s1">&#39;VADER_score&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;VADER_label&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">vader_results</span><span class="p">[</span><span class="s1">&#39;VADER_prob&#39;</span><span class="p">]</span> <span class="o">=</span>  <span class="n">vader_results</span><span class="p">[</span><span class="s1">&#39;VADER_dict&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">sent_dict</span><span class="p">:</span> <span class="n">sent_dict</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">])</span>
+
+    <span class="n">evaluate_model_test</span><span class="p">(</span><span class="n">test_data</span><span class="p">[</span><span class="s1">&#39;Sentiment&#39;</span><span class="p">],</span> <span class="n">vader_results</span><span class="p">[</span><span class="s1">&#39;VADER_label&#39;</span><span class="p">],</span> <span class="n">vader_results</span><span class="p">[</span><span class="s1">&#39;VADER_prob&#39;</span><span class="p">])</span></div>
+
+
+
+<div class="viewcode-block" id="final_svm_full_model"><a class="viewcode-back" href="../../../../../root.src.model.sa.html#root.src.model.sa.sa_train.final_svm_full_model">[docs]</a><span class="k">def</span> <span class="nf">final_svm_full_model</span><span class="p">(</span><span class="n">train_data</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    input : full preprocessed train data</span>
+<span class="sd">    output : final svm model</span>
+<span class="sd">    function : Refit svm model on comeplete training data and save the final model for future unseen predictions</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    
+    <span class="n">svm</span> <span class="o">=</span> <span class="n">NuSVC</span><span class="p">(</span><span class="n">gamma</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="n">probability</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="c1"># create the Kfold object</span>
+    <span class="n">kf</span> <span class="o">=</span> <span class="n">StratifiedKFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+        
+    <span class="n">score_metrics</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;accuracy&#39;</span><span class="p">,</span> <span class="s1">&#39;f1&#39;</span><span class="p">,</span> <span class="s1">&#39;f1_weighted&#39;</span><span class="p">,</span> <span class="s1">&#39;average_precision&#39;</span><span class="p">]</span>
+    <span class="n">cv_results</span> <span class="o">=</span> <span class="n">cross_validate</span><span class="p">(</span><span class="n">svm</span><span class="p">,</span> <span class="n">train_data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span> <span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">train_data</span><span class="p">[</span><span class="s1">&#39;Sentiment&#39;</span><span class="p">],</span> <span class="n">cv</span> <span class="o">=</span> <span class="n">kf</span><span class="p">,</span> <span class="n">scoring</span> <span class="o">=</span> <span class="n">score_metrics</span><span class="p">)</span>
+        
+     <span class="c1"># Print cross validation scores</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;CROSS VALIDATION RESULTS&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Average Cross Validation score accuracy :</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cv_results</span><span class="p">[</span><span class="s1">&#39;test_accuracy&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Average Cross Validation score F1 :</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cv_results</span><span class="p">[</span><span class="s1">&#39;test_f1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Average Cross Validation score F1_weighted :</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cv_results</span><span class="p">[</span><span class="s1">&#39;test_f1_weighted&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Average Cross Validation score pr_auc :</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cv_results</span><span class="p">[</span><span class="s1">&#39;test_average_precision&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()))</span>
+
+    <span class="c1"># Final fit</span>
+    <span class="n">svm</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span> <span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">train_data</span><span class="p">[</span><span class="s1">&#39;Sentiment&#39;</span><span class="p">])</span>
+
+    <span class="c1"># Save model</span>
+    <span class="n">joblib</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">svm</span><span class="p">,</span> <span class="s1">&#39;root/models/sa/final_svm_model.pkl&#39;</span><span class="p">)</span></div>
+    
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">input_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="sa">rf</span><span class="s2">&quot;root/src/data/sa/features_train_sa.csv&quot;</span><span class="p">)</span>
+    <span class="n">final_svm_full_model</span><span class="p">(</span><span class="n">input_data</span><span class="p">)</span>
+
+    
+    
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, CAJN.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
