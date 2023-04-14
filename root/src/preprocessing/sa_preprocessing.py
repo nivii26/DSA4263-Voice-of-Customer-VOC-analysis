@@ -269,14 +269,13 @@ def final_full_data_preprocess(test_data):
 
 if __name__ == "__main__":
 
-	os.chdir("./root/src/preprocessing")
 	current_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
 	master_data = pd.DataFrame(columns=["Sentiment", "Time", "Text"])
 
 	# Load Data
-	for file in os.listdir(r"../../data/processed"):
+	for file in os.listdir(r"root/data/processed"):
 		if file.endswith(".csv"):
-			new_data = pd.read_csv(rf"../../data/processed/{file}")
+			new_data = pd.read_csv(rf"root/data/processed/{file}")
 			master_data = pd.concat([master_data, new_data])
 	
 	# process data and feature engineering for training data
