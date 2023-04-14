@@ -357,9 +357,9 @@ def final_svm_full_model(train_data):
     # Save model
     joblib.dump(svm, 'root/models/sa/final_svm_model.pkl')
     
-    if __name__ == "__main__":
-    input_data = pd.read_csv(rf"root/src/data/sa/features_train_sa.csv")
-    final_svm_full_model(input_data)
+    # if __name__ == "__main__":
+    #     input_data = pd.read_csv(rf"root/src/data/sa/features_train_sa.csv")
+    #     final_svm_full_model(input_data)
 
     
     
