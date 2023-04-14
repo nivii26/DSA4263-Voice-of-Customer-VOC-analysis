@@ -114,3 +114,7 @@ streamlit run root/src/visualization/visualize.py path_to_file_to_visualize
 Alternatively, view ['this repository'](https://github.com/nivii26/VoC-streamlit-app) for a demo of our streamlit app!
 
 Click ['here'](https://share.streamlit.io/app/nivii26-voc-streamlit-app-visualize-9xla2m/) to access a demo_dashboard
+
+## Repository Breakdown
+
+![Repository Tree](./root/src/assets/tree.jpg)
