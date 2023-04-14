@@ -111,7 +111,7 @@ Note: Modify 2nd argument, to be the path to a raw dataframe with columns ['Time
 
 View this notebook ['topic_modelling'](https://github.com/nivii26/DSA4263-Voice-of-Customer-VOC-analysis/blob/main/root/ipynb/topic_modelling.ipynb) for a step-by-step demo of this subtask.
 
-**Preprocessing**: Run topic modelling specific preprocessing. 
+**Preprocessing**: Run topic modelling specific preprocessing. (This will create a file with embeddings root/src/data/sa/file features_train_sa.csv)
 ```
 python root/src/preprocessing/tm_preprocessing.py
 ```
