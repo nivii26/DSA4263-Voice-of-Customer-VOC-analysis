@@ -73,7 +73,7 @@ View this notebook ['sentiment_analysis_demo'](https://github.com/nivii26/DSA426
 To run the preprocessing step run -
 
 ```bash
-python root/src/preprocessing/sa_preprocessing.py root/data/raw/test_sa_input.csv
+python root/src/preprocessing/sa_preprocessing.py root/data/raw/sample_RAW_DF_train.csv
 ```
 
 **Training**: We experiment with several classification models such as the Naive Baye's Classifier, Logistic Regression, SVM (Support Vector Machine), XGBoost and pretrained models like Vader and Falir. View the table below for relative perfromace of these models on the test data (from train-test split) and our inference -
