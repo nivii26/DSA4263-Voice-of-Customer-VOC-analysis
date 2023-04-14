@@ -47,7 +47,7 @@ The app is hosted on -
 
 ![image](./root/src/assets/swagger.jpg)
 
-Some usage examples can be found in the [api_demo notebook](https://https://github.com/nivii26/DSA4263-Voice-of-Customer-VOC-analysis/tree/main/root/ipynb/api_demo.ipynb)
+Some usage examples can be found in the [api_demo notebook](https://github.com/nivii26/DSA4263-Voice-of-Customer-VOC-analysis/blob/main/root/ipynb/api_demo.ipynb)
 
 ## Task Breakdown
 
