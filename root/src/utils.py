@@ -3,9 +3,9 @@ import pandas as pd
 import requests
 import zipfile
 
-from preprocessing import TM_PREPROCESS_TEST, SA_PREPROCESS_TEST
-from model import SA_MODEL_PREDICT
-from model import TM_MODEL_PREDICT
+from .preprocessing import TM_PREPROCESS_TEST, SA_PREPROCESS_TEST
+from .model import SA_MODEL_PREDICT
+from .model import TM_MODEL_PREDICT
 
 def zip_preprocess(zip_file, expected_columns):
     """
