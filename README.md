@@ -146,3 +146,10 @@ Click ['here'](https://share.streamlit.io/app/nivii26-voc-streamlit-app-visualiz
 ## Repository Breakdown
 
 ![Repository Tree](./root/src/assets/tree.jpg)
+
+## Sphinx Documentation
+Navigate to the parent folder and click - 
+```
+docs/_build/html/index.html
+```
+This will open the documentation on a local host
