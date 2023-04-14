@@ -8,43 +8,45 @@ The Voice of the Customer (VoC) is a methodology used to capture customers’ ne
 
 1. **Docker**
 
-Run  
+    Run  
 
-```
-docker build -t api .
-```  
+    ```bash
+    docker build -t api .
+    ```  
 
-For MAC/Linux:
-```
-docker run -d -p 5000:5000 -v ${pwd}:/app api
-```
+    For MAC/Linux:
 
-For Windows:
-```
-docker run -d -p 5000:5000 -v ${PWD}:/app api
-```
+    ```bash
+    docker run -d -p 5000:5000 -v ${pwd}:/app api
+    ```
+
+    For Windows:
+
+    ```bash
+    docker run -d -p 5000:5000 -v ${PWD}:/app api
+    ```
 
 2. **Virtual Environment**
 
 - Create a virtual environment of your choice; eg:
 
-```
+```bash
 virtualenv venv
 ```
 
 - Activate virtual environment & Install dependencies
 
-```
+```bash
 source venv/Scripts/activate
 ```
 
-```
+```bash
 pip install -r requirements.txt
 ```
 
 - Run the API with
 
-```
+```bash
 uvicorn --app-dir=./root/src main:app --port 5000
 ```
 
@@ -65,7 +67,7 @@ View this notebook ['sentiment_analysis_demo'](https://github.com/nivii26/DSA426
 
 To run the preprocessing step run -
 
-```
+```bash
 TO DO 
 ```
 
@@ -73,7 +75,7 @@ TO DO
 Performance Comparision Table
 
 |    Model             |    Weighted F1 (train)    |       Weighted F1 (Test)| PR_AUC (TRAIN) | PR_AUC (TEST) |  Evaluation|
-| -----------          | -----------               | -----------             |-----------     |-----------    |   -----| 
+| -----------          | -----------               | -----------             |-----------     |-----------    |   -----|
 |  Naive Baye's        |    0.72   |     0.54 |      0.81      | 0.72  | Overfit train data (Baseline performance) |
 |  Logistic Regression |    0.88                   |    0.86                     |      0.96      | 0.96    | Good but SVM performs better |
 |   Non - Linear SVM   |    0.9                    |     0.87                    |      0.97      | 0.97    | Best Performance (with our own pre-processing)|
@@ -85,7 +87,7 @@ The two best perfroming models were Non-Linear SVM and Flair based on the above 
 
 To train new data using our methodology, run -
 
-```
+```bash
 TO DO 
 ```
 
@@ -93,7 +95,7 @@ TO DO
 
 To obtain predictions, run -
 
-```
+```bash
 TO DO 
 ```
 
@@ -107,7 +109,7 @@ To load the visualisation locally, ensure that the packages streamlit and Circli
 
 Run the following command in the terminal to access the dashboard through a local host.
 
-```
+```bash
 streamlit run root/src/visualization/visualize.py path_to_file_to_visualize
 ```
 
