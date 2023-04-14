@@ -1,24 +1,15 @@
-.DS_Store
-*__pycache__
-.vscode
-root/ipynb/ipynb_checkpoints
-# *.ipynb
-
 # Env
 *.venv
 *.env
 
 # Data
-root/data/*/*.csv
-root/src/*/*.csv
+root/data/*
 
 # Models
-root/Models/tm/*
-root/Models/sa/*
+root/models/*
 
-# NLP
-pos_wv
-neg_wv
-*.mm*
-*.dict*
-
+# Miscellaneous 
+.DS_Store
+*__pycache__
+.vscode
+root/ipynb/ipynb_checkpoints
