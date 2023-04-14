@@ -96,7 +96,7 @@ TO DO
 To obtain predictions, run -
 
 ```bash
-TO DO 
+python root/src/model/sa/sa_predict.py root/data/raw/sample_RAW_DF.csv
 ```
 
 ### TASK 2 : Topic Modeling
