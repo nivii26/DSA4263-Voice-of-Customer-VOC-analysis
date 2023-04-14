@@ -153,3 +153,5 @@ Navigate to the parent folder and click -
 docs/_build/html/index.html
 ```
 This will open the documentation on a local host
+![Screenshot 2023-04-14 at 11 57 51 PM](https://user-images.githubusercontent.com/65957285/232095285-36782cae-d04d-4d78-9591-62cd5332838e.png)
+
