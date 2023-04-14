@@ -52,6 +52,23 @@ Some usage examples can be found in the [api_demo notebook](https://https://gith
 ## Task Breakdown
 
 ### TASK 1 : Sentiment Analysis
+Preprocessing: Our preprocessing methodology for Sentiment Classification is to generate word embeddings for the 'Text' column in reviews.csv by concatinating the embeddings generated from Word2vec and TF-IDF (Term Frequency - Inverse Document Frequency). We then apply PCA (Principal Component Analysis) to reduce the dimensionality of the embedding space. This step can help to speed up the subsequent analysis while still retaining the important features of the text.
+
+To run the preprocessing step please view the python notebook.
+
+Training: We experiment with several classification models such as the Naive Baye's Classifier, Logistic Regression, SVM (Support Vector Machine), XGBoost and pretrained models like Vader and Falir. View the table below for relative perfromace of these models and our inference - 
+Performance Comparision Table
+
+|    Model             |    Weighted F1 (train)    |       Weighted F1 (Test)| PR_AUC (TRAIN) | PR_AUC (TEST) |  Evaluation|
+| -----------          | -----------               | -----------             |-----------     |-----------    |   -----| 
+|  Naive Baye's        |    0.72   |     0.54 |      0.81      | 0.72  | Overfit train data (Baseline performance) |
+|  Logistic Regression |    0.88                   |    0.86                     |      0.96      | 0.96    | Good but SVM performs better |
+|   Non - Linear SVM   |    0.9                    |     0.87                    |      0.97      | 0.97    | Best Performance (with our own pre-processing)|
+|   XGBoost            |    0.9                    |     0.79                    |      0.96      | 0.94   | Overfit train data|
+|   Vader              |    0.80                   |     0.87                    |      0.93      | 0.94   | Rule-based, not the best approach|
+|   Flair              |    0.94                   |      0.93                   |      0.99      | 0.99   | Best perfromance (pretrained)|
+
+The two best perfroming models were Non-Linear SVM and Flair based on the above metrics of 'weighted F1 score' and 'PR-AUC'. 
 
 ### TASK 2 : Topic Modeling
 
@@ -67,6 +84,6 @@ Run the following command in the terminal to access the dashboard through a loca
 streamlit run root/src/visualization/visualize.py path_to_file_to_visualize
 ```
 
-Alternatively, view ['this repository'](https://github.com/nivii26/VoC-streamlit-app)
+Alternatively, view ['this repository'](https://github.com/nivii26/VoC-streamlit-app) for a demo of our streamlit app!
 
 Click ['here'](https://share.streamlit.io/app/nivii26-voc-streamlit-app-visualize-9xla2m/) to access a demo_dashboard
