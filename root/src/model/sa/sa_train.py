@@ -43,7 +43,7 @@ from sklearn.svm import NuSVC
 
 # For VADER
 import nltk
-nltk.download('vader_lexicon')
+#nltk.download('vader_lexicon')
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
 # for saving models

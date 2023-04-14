@@ -20,9 +20,9 @@ from sklearn.decomposition import PCA
 from .rawdata_preprocessing import PREPROCESS_RAW, remove_html
 
 # download necessary NLTK data (only need to run this once)
-nltk.download('punkt')
-nltk.download('wordnet')
-nltk.download('stopwords')
+#nltk.download('punkt')
+#nltk.download('wordnet')
+#nltk.download('stopwords')
 
 def sa_preprocess(text):
 	'''
