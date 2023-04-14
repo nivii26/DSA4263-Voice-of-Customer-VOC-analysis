@@ -93,4 +93,4 @@ def TM_MODEL_PREDICT(tm_df: pd.DataFrame) -> pd.DataFrame:
     batch_predictions = batch_predict(corpus, model)
     tm_df["Predicted Topic"] = batch_predictions
     tm_df['Main Topic'] = tm_df.apply(extract_topic, axis=1)
-    return tm_df.drop("processed_text", axis=1)
+    return tm_df
