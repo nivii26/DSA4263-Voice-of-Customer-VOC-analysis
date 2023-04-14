@@ -4,6 +4,7 @@ import numpy as np
 import os
 import random
 import datetime
+import argparse
 
 # for saving models
 import joblib
@@ -202,7 +203,7 @@ def SA_PREPROCESS_TRAIN(train_data):
 	joblib.dump(tfidf, 'root/models/sa/tfidf_sa.pkl')
 	joblib.dump(pca_emb, 'root/models/sa/pca_emb.pkl')
 	joblib.dump(pca_tfidf, 'root/models/sa/pca_tfidf.pkl')
-	# features_df.to_csv("../data/sa/features_train_sa.csv", index=False)
+	features_df.to_csv("root/src/data/sa/features_train_sa.csv", index=False)
 	return features_df
 
 def SA_PREPROCESS_TEST(raw_data):
@@ -266,22 +267,16 @@ def final_full_data_preprocess(test_data):
 	return features_df
 
 
+def main(file_path):
+    data = pd.read_csv(file_path)
+    SA_PREPROCESS_TRAIN(data)
 
-if __name__ == "__main__":
 
-	current_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
-	master_data = pd.DataFrame(columns=["Sentiment", "Time", "Text"])
+if __name__ == '__main__':
+    # Define and parse command-line arguments
+    parser = argparse.ArgumentParser(description="Process a CSV file for analysis.")
+    parser.add_argument("file_path", type=str, help="Path to CSV file.")
+    args = parser.parse_args()
 
-	# Load Data
-	for file in os.listdir(r"root/data/processed"):
-		if file.endswith(".csv"):
-			new_data = pd.read_csv(rf"root/data/processed/{file}")
-			master_data = pd.concat([master_data, new_data])
-	
-	# process data and feature engineering for training data
-	train_feature = SA_PREPROCESS_TRAIN(master_data)
-
-	# process data and feature engineering for test data
-	#SA_PROCESSED_DF_XGB, SA_PROCESSED_DF_FLAIR=SA_PREPROCESS_TEST(raw_data)
-	#SA_PROCESSED_DF_XGB.to_csv("../data/sa/features_train_sa_new.csv", index=False)
-	#SA_PROCESSED_DF_FLAIR.to_csv("../data/sa/features_test_sa_new.csv", index=False)
+    # Call the main function with the file path argument
+    main(args.file_path)
