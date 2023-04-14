@@ -50,11 +50,16 @@ The app is hosted on -
 Some usage examples can be found in the [api_demo notebook](https://github.com/nivii26/DSA4263-Voice-of-Customer-VOC-analysis/blob/main/root/ipynb/api_demo.ipynb)
 
 ## Task Breakdown
-View this notebook ['sentiment_analysis_demo'](https://github.com/nivii26/DSA4263-Voice-of-Customer-VOC-analysis/tree/main/root/ipynb/sentiment_analysis_demo.ipynb) for a step-by-step demo of this subtask.
+
 ### TASK 1 : Sentiment Analysis
+View this notebook ['sentiment_analysis_demo'](https://github.com/nivii26/DSA4263-Voice-of-Customer-VOC-analysis/blob/main/root/ipynb/sentiment_analysis_demo.ipynb) for a step-by-step demo of this subtask.
+
 **Preprocessing**: Our preprocessing methodology for Sentiment Classification is to generate word embeddings for the 'Text' column in reviews.csv by concatinating the embeddings generated from Word2vec and TF-IDF (Term Frequency - Inverse Document Frequency). We then apply PCA (Principal Component Analysis) to reduce the dimensionality of the embedding space. This step can help to speed up the subsequent analysis while still retaining the important features of the text.
 
-To run the preprocessing step please view the python notebook.
+To run the preprocessing step run - 
+```
+TO DO 
+```
 
 **Training**: We experiment with several classification models such as the Naive Baye's Classifier, Logistic Regression, SVM (Support Vector Machine), XGBoost and pretrained models like Vader and Falir. View the table below for relative perfromace of these models on the test data (from train-test split) and our inference - 
 Performance Comparision Table
@@ -70,7 +75,17 @@ Performance Comparision Table
 
 The two best perfroming models were Non-Linear SVM and Flair based on the above metrics of 'weighted F1 score' and 'PR-AUC'. Hence our, final model is an ensemble of these two models based on aggregration (average).
 
+To train new data using our methodology, run - 
+```
+TO DO 
+```
+
 **Predict**: The prediction method takes a preprocessed DataFrame (fot SVM) and original cleaned up text (for the model 'Flair') as input. The output is a DataFrame with the the sentiment_labels and probabilities from the two individual models and the final_sentiment and final_probability from the ensembling process, which are our final sentiment predictions.
+
+To obtain predictions, run - 
+```
+TO DO 
+```
 
 ### TASK 2 : Topic Modeling
 
