@@ -68,7 +68,7 @@ View this notebook ['sentiment_analysis_demo'](https://github.com/nivii26/DSA426
 To run the preprocessing step run -
 
 ```bash
-TO DO 
+python root/src/preprocessing/sa_preprocessing.py root/data/raw/test_sa_input.csv
 ```
 
 **Training**: We experiment with several classification models such as the Naive Baye's Classifier, Logistic Regression, SVM (Support Vector Machine), XGBoost and pretrained models like Vader and Falir. View the table below for relative perfromace of these models on the test data (from train-test split) and our inference -
@@ -88,7 +88,7 @@ The two best perfroming models were Non-Linear SVM and Flair based on the above 
 To train new data using our methodology, run -
 
 ```bash
-TO DO 
+python root/src/model/sa/sa_train.py
 ```
 
 **Predict**: The prediction method takes a preprocessed DataFrame (fot SVM) and original cleaned up text (for the model 'Flair') as input. The output is a DataFrame with the the sentiment_labels and probabilities from the two individual models and the final_sentiment and final_probability from the ensembling process, which are our final sentiment predictions.
