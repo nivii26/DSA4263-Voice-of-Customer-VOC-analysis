@@ -106,7 +106,7 @@ python root/src/model/sa/sa_predict.py root/data/raw/sample_RAW_DF.csv
 
 ### TASK 2 : Topic Modeling
 
-View this notebook ['topic_modellinng'](https://github.com/nivii26/DSA4263-Voice-of-Customer-VOC-analysis/blob/main/root/ipynb/topic_modelling.ipynb) for a step-by-step demo of this subtask.
+View this notebook ['topic_modelling'](https://github.com/nivii26/DSA4263-Voice-of-Customer-VOC-analysis/blob/main/root/ipynb/topic_modelling.ipynb) for a step-by-step demo of this subtask.
 
 **Preprocessing**: Run topic modelling specific preprocessing. 
 ```
